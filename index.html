@@ -14,7 +14,7 @@ body{
   color:white;
 }
 
-/* ================= SXJ SPLASH SCREEN ================= */
+/* ================= SXJ SPLASH ================= */
 
 #splashScreen{
   position:fixed;
@@ -23,7 +23,6 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  overflow:hidden;
   z-index:99999;
 }
 
@@ -32,46 +31,22 @@ body{
   font-size:72px;
   font-weight:900;
   letter-spacing:12px;
-  opacity:0;
-  animation:logoIntro 2.5s ease forwards;
   text-shadow:0 0 20px #FFD700;
-}
-
-.wind{
-  position:absolute;
-  width:300px;
-  height:3px;
-  background:#FFD700;
-  filter:blur(4px);
-  left:-350px;
-  top:50%;
-  animation:windMove 2.5s ease forwards;
-}
-
-@keyframes windMove{
-  0%{left:-350px;opacity:0;}
-  20%{opacity:1;}
-  100%{left:120%;opacity:0;}
+  animation:logoIntro 2.5s ease forwards;
 }
 
 @keyframes logoIntro{
   0%{opacity:0;transform:translateX(-100px);}
-  35%{opacity:1;transform:translateX(0);}
-  70%{text-shadow:0 0 25px #FFD700;}
-  100%{opacity:0;transform:scale(1.1);}
+  50%{opacity:1;}
+  100%{opacity:0;transform:scale(1.2);}
 }
 
-/* ================= MAIN ================= */
+/* ================= SCREEN ================= */
 
-.screen{
-  display:none;
-  padding:15px;
-  min-height:100vh;
-}
-
+.screen{display:none;padding:15px;}
 .active{display:block;}
 
-/* ================= INPUTS ================= */
+/* ================= INPUT ================= */
 
 select,button{
   width:100%;
@@ -79,21 +54,15 @@ select,button{
   margin-top:12px;
   background:#0a0a0a;
   color:white;
-  border:2px solid rgba(255,215,0,0.9);
+  border:2px solid #FFD700;
   border-radius:10px;
-  font-size:16px;
   cursor:pointer;
-  transition:0.25s ease;
-  box-shadow:0 0 8px rgba(255,215,0,0.3);
+  transition:0.25s;
 }
 
 button:hover,select:hover{
   transform:scale(1.03);
-  box-shadow:0 0 15px rgba(255,215,0,0.8);
-}
-
-button:active,select:active{
-  transform:scale(0.96);
+  box-shadow:0 0 15px #FFD700;
 }
 
 /* ================= OVERLAY ================= */
@@ -109,15 +78,8 @@ button:active,select:active{
 }
 
 .wc{
-  font-size:28px;
   color:#FFD700;
-  animation:pulse 1s infinite;
-}
-
-@keyframes pulse{
-  0%{transform:scale(1);opacity:.6;}
-  50%{transform:scale(1.15);opacity:1;}
-  100%{transform:scale(1);opacity:.6;}
+  font-size:28px;
 }
 
 /* ================= RESULT ================= */
@@ -126,8 +88,6 @@ button:active,select:active{
   font-size:34px;
   text-align:center;
   color:#FFD700;
-  margin-top:10px;
-  text-shadow:0 0 15px #FFD700;
 }
 
 .stats,.goalBox{
@@ -135,7 +95,6 @@ button:active,select:active{
   background:#0b1220;
   padding:12px;
   border-radius:12px;
-  border:1px solid rgba(255,215,0,0.3);
 }
 
 /* ================= POSSESSION BAR ================= */
@@ -148,33 +107,23 @@ button:active,select:active{
 }
 
 .bar{
-  width:100%;
+  display:flex;
   height:14px;
   background:#111;
   border-radius:20px;
   overflow:hidden;
-  display:flex;
 }
 
 .barA{
-  height:100%;
+  background:#FFD700;
   width:0%;
-  background:linear-gradient(90deg,#FFD700,#ffcc00);
-  transition:2s ease;
+  transition:2s;
 }
 
 .barB{
-  height:100%;
-  width:0%;
   background:#444;
-  transition:2s ease;
-}
-
-.barLabels{
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  margin-top:6px;
+  width:0%;
+  transition:2s;
 }
 
 /* ================= ROW ================= */
@@ -183,7 +132,6 @@ button:active,select:active{
   display:flex;
   justify-content:space-between;
   padding:6px 0;
-  font-size:14px;
 }
 
 /* ================= MOBILE ================= */
@@ -197,41 +145,109 @@ button:active,select:active{
 
 <body>
 
+<!-- SPLASH -->
 <div id="splashScreen">
-  <div class="wind"></div>
   <div class="sxj-logo">SXJ</div>
 </div>
 
-<div id="selectScreen" class="screen">
+<!-- SELECT -->
+<div id="selectScreen" class="screen active">
 
-  <h2>🏆 World Cup 2026 Simulator</h2>
+<h2>🏆 World Cup 2026 Simulator</h2>
 
-  <select id="teamA"></select>
-  <select id="teamB"></select>
+<select id="teamA"></select>
+<select id="teamB"></select>
 
-  <button onclick="startMatch()">START MATCH</button>
+<button onclick="startMatch()">START MATCH</button>
 
 </div>
 
+<!-- OVERLAY -->
 <div id="overlay" class="overlay">
   <div class="wc">🏆 FIFA WORLD CUP 2026</div>
   <p id="loadingText">Loading Engine...</p>
 </div>
 
+<!-- RESULT -->
 <div id="resultScreen" class="screen">
 
-  <div class="score" id="finalScore"></div>
-  <div class="stats" id="statsBox"></div>
-  <div class="goalBox" id="goalBox"></div>
+<div class="score" id="finalScore"></div>
+<div class="stats" id="statsBox"></div>
+<div class="goalBox" id="goalBox"></div>
 
-  <button onclick="goBack()">Back</button>
+<button onclick="goBack()">Back</button>
 
 </div>
 
 <script>
 
-/* TEAMS */
-let teams=["Argentina","Brazil","France","England","Spain","Germany","Portugal","Netherlands"];
+/* ================= 48 TEAMS RESTORED ================= */
+
+let teams=[
+"Argentina","Brazil","France","England","Spain","Germany","Portugal","Netherlands",
+"Italy","Belgium","Croatia","Morocco","Japan","Mexico","Canada","USA",
+"Egypt","Senegal","Uruguay","Colombia","Switzerland","Norway","Türkiye","Qatar",
+"Saudi Arabia","Australia","New Zealand","Korea Republic","Iran","Iraq","Uzbekistan",
+"Algeria","Austria","Bosnia","Cabo Verde","DR Congo","Côte d'Ivoire","Curaçao","Czechia",
+"Ecuador","Ghana","Haiti","Jordan","Panama","Paraguay","Scotland","South Africa",
+"Sweden","Tunisia"
+];
+
+/* ================= PLAYERS (TOP 3 ONLY) ================= */
+
+const players={
+"Argentina":["Messi","Álvarez","Lautaro"],
+"Brazil":["Vinícius","Rodrygo","Richarlison"],
+"France":["Mbappé","Griezmann","Thuram"],
+"England":["Kane","Saka","Foden"],
+"Spain":["Morata","Pedri","Yamal"],
+"Germany":["Musiala","Havertz","Kimmich"],
+"Portugal":["Ronaldo","Bruno","Nuno"],
+"Netherlands":["Depay","Gakpo","Simons"],
+"Italy":["Chiesa","Barella","Raspadori"],
+"Belgium":["De Bruyne","Lukaku","Doku"],
+"Croatia":["Modrić","Kramarić","Perišić"],
+"Morocco":["Hakimi","Ziyech","En-Nesyri"],
+"Japan":["Kubo","Mitoma","Minamino"],
+"Mexico":["Lozano","Jiménez","Vega"],
+"Canada":["David","Larin","Buchanan"],
+"USA":["Pulisic","Balogun","Reyna"],
+"Egypt":["Salah","Marmoush","Trezeguet"],
+"Senegal":["Mané","Jackson","Sarr"],
+"Uruguay":["Núñez","Valverde","Pellistri"],
+"Colombia":["Luis Díaz","Durán","James"],
+"Switzerland":["Xhaka","Embolo","Shaqiri"],
+"Norway":["Haaland","Ødegaard","Sørloth"],
+"Türkiye":["Çalhanoğlu","Yıldız","Aktürkoğlu"],
+"Qatar":["Afif","Almoez","Hassan"],
+"Saudi Arabia":["Dawsari","Shehri","Buraikan"],
+"Australia":["Goodwin","Boyle","Maclaren"],
+"New Zealand":["Chris Wood","Barbarouses","Singh"],
+"Korea Republic":["Son","Hwang","Lee"],
+"Iran":["Taremi","Azmoun","Ghoddos"],
+"Iraq":["Ali","Hussein","Adnan"],
+"Uzbekistan":["Shomurodov","Hamrobekov","Saidov"],
+"Algeria":["Mahrez","Slimani","Bounedjah"],
+"Austria":["Sabitzer","Baumgartner","Arnautović"],
+"Bosnia":["Džeko","Pjanić","Krunić"],
+"Cabo Verde":["Semedo","Pina","Garcia"],
+"DR Congo":["Bakambu","Mbemba","Bolasie"],
+"Côte d'Ivoire":["Haller","Adingra","Kessié"],
+"Curaçao":["Bacuna","Janga","Maria"],
+"Czechia":["Schick","Souček","Coufal"],
+"Ecuador":["Valencia","Caicedo","Plata"],
+"Ghana":["Kudus","Ayew","Partey"],
+"Haiti":["Nazon","Pierrot","Pascual"],
+"Jordan":["Al-Naimat","Al-Taamari","Abu Taha"],
+"Panama":["Díaz","Torres","Rodríguez"],
+"Paraguay":["Almirón","Sanabria","Romero"],
+"Scotland":["McTominay","Robertson","Dykes"],
+"South Africa":["Lorch","Makgopa","Mokoena"],
+"Sweden":["Isak","Kulusevski","Gyökeres"],
+"Tunisia":["Msakni","Jaziri","Sliti"]
+};
+
+/* ================= SETUP ================= */
 
 const teamA=document.getElementById("teamA");
 const teamB=document.getElementById("teamB");
@@ -244,24 +260,8 @@ teams.forEach(t=>{
   teamB.add(b);
 });
 
-/* TOP PLAYERS ONLY */
-const players={
-"Argentina":["Messi","Álvarez","Martínez"],
-"Brazil":["Vinícius","Rodrygo","Richarlison"],
-"France":["Mbappé","Griezmann","Thuram"],
-"England":["Kane","Saka","Foden"],
-"Spain":["Morata","Pedri","Yamal"],
-"Germany":["Musiala","Havertz","Kimmich"],
-"Portugal":["Ronaldo","Bruno","Nuno"],
-"Netherlands":["Depay","Gakpo","Simons"]
-};
+/* ================= SIM ================= */
 
-/* ONLY TOP 3 PICK */
-function randomPlayer(team){
-  return players[team][Math.floor(Math.random()*3)];
-}
-
-/* SIMPLE SIMULATION */
 function simulate(){
   return {
     scoreA:Math.floor(Math.random()*4),
@@ -273,7 +273,14 @@ function simulate(){
   };
 }
 
-/* SCREEN */
+/* ================= PLAYER ================= */
+
+function randomPlayer(team){
+  return players[team][Math.floor(Math.random()*3)];
+}
+
+/* ================= SCREEN ================= */
+
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
@@ -281,77 +288,72 @@ function showScreen(id){
 
 function goBack(){ showScreen("selectScreen"); }
 
-/* START MATCH */
+/* ================= MATCH ================= */
+
 function startMatch(){
 
-  let A=teamA.value;
-  let B=teamB.value;
+let A=teamA.value;
+let B=teamB.value;
 
-  document.getElementById("overlay").style.display="flex";
+document.getElementById("overlay").style.display="flex";
 
-  setTimeout(()=>{
+setTimeout(()=>{
 
-    document.getElementById("overlay").style.display="none";
+document.getElementById("overlay").style.display="none";
 
-    let result=simulate();
-    result.possB=100-result.possA;
+let result=simulate();
+result.possB=100-result.possA;
 
-    document.getElementById("finalScore").innerText=
-      `${A} ${result.scoreA} - ${result.scoreB} ${B}`;
+document.getElementById("finalScore").innerText=
+`${A} ${result.scoreA} - ${result.scoreB} ${B}`;
 
-    document.getElementById("statsBox").innerHTML=`
+/* STATS + BAR */
+document.getElementById("statsBox").innerHTML=`
+<div class="possessionWrap">
+<b>Possession</b>
+<div class="bar">
+<div class="barA" id="barA"></div>
+<div class="barB" id="barB"></div>
+</div>
+</div>
 
-      <div class="possessionWrap">
-        <b>Possession</b>
-        <div class="bar">
-          <div class="barA" id="barA"></div>
-          <div class="barB" id="barB"></div>
-        </div>
-        <div class="barLabels">
-          <span>${A}</span>
-          <span>${B}</span>
-        </div>
-      </div>
+<div class="row"><b>Shots</b><span>${result.shotsA}-${result.shotsB}</span></div>
+<div class="row"><b>On Target</b><span>${result.onTargetA}-${result.onTargetB}</span></div>
+<div class="row"><b>Passes</b><span>${result.passesA}-${result.passesB}</span></div>
+`;
 
-      <div class="row"><b>Shots</b><span>${result.shotsA} - ${result.shotsB}</span></div>
-      <div class="row"><b>On Target</b><span>${result.onTargetA} - ${result.onTargetB}</span></div>
-      <div class="row"><b>Passes</b><span>${result.passesA} - ${result.passesB}</span></div>
-    `;
+setTimeout(()=>{
+document.getElementById("barA").style.width=result.possA+"%";
+document.getElementById("barB").style.width=result.possB+"%";
+},100);
 
-    setTimeout(()=>{
-      document.getElementById("barA").style.width=result.possA+"%";
-      document.getElementById("barB").style.width=result.possB+"%";
-    },100);
+/* GOALS FIXED */
+let goals=[];
 
-    /* GOAL SCORERS FIXED */
-    let goals=[];
+for(let i=0;i<result.scoreA;i++)
+goals.push(`⚽ ${randomPlayer(A)} (${A})`);
 
-    for(let i=0;i<result.scoreA;i++){
-      goals.push(`⚽ ${randomPlayer(A)} (${A})`);
-    }
+for(let i=0;i<result.scoreB;i++)
+goals.push(`⚽ ${randomPlayer(B)} (${B})`);
 
-    for(let i=0;i<result.scoreB;i++){
-      goals.push(`⚽ ${randomPlayer(B)} (${B})`);
-    }
+goals.sort(()=>Math.random()-0.5);
 
-    goals.sort(()=>Math.random()-0.5);
+document.getElementById("goalBox").innerHTML=
+`<b>Goalscorers</b><br><br>${goals.join("<br>")}`;
 
-    document.getElementById("goalBox").innerHTML=`
-      <b>Goalscorers</b><br><br>
-      ${goals.join("<br>")}
-    `;
+showScreen("resultScreen");
 
-    showScreen("resultScreen");
+},2000);
 
-  },2000);
 }
 
-/* INIT */
+/* ================= INIT ================= */
+
 window.onload=()=>{
-  setTimeout(()=>{
-    document.getElementById("splashScreen").style.display="none";
-    showScreen("selectScreen");
-  },2000);
+setTimeout(()=>{
+document.getElementById("splashScreen").style.display="none";
+showScreen("selectScreen");
+},2000);
 };
 
 </script>
