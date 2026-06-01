@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Football Simulator V2</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #050b14;
+  color: white;
+}
+
+.screen { display:none; padding:20px; height:100vh; }
+.active { display:block; }
+
+select, button {
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  background:#111;
+  border:1px solid #00ffcc;
+  color:white;
+  border-radius:8px;
+}
+
+.overlay {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.95);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+}
+
+.glow { color:#00ffcc; font-size:18px; }
+
+.score {
+  font-size:42px;
+  text-align:center;
+  color:#00ffcc;
+}
+
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+
+.box {
+  background:#0d1a2b;
+  padding:10px;
+  border-radius:10px;
+}
+
+.commentary {
+  height:200px;
+  overflow:auto;
+  background:#0b1220;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  font-size:14px;
+}
+
+.goal { color:#aaa; margin-top:5px; }
+</style>
+</head>
+
+<body>
+
+<div id="selectScreen" class="screen active">
+  <h2>⚽ Football Simulator V2</h2>
+
+  <select id="teamA"></select>
+  <select id="teamB"></select>
+
+  <button onclick="startMatch()">START MATCH</button>
+</div>
+
+<div id="overlay" class="overlay">
+  <div class="glow" id="loadingText">Loading AI Engine...</div>
+</div>
+
+<div id="matchScreen" class="screen">
+
+  <div class="score" id="score">0 - 0</div>
+
+  <div class="grid">
+    <div class="box">
+      <h3>Stats</h3>
+      <div id="stats"></div>
+    </div>
+
+    <div class="box">
+      <h3>Possession</h3>
+      <div id="possession"></div>
+    </div>
+  </div>
+
+  <div class="commentary" id="commentary"></div>
+
+  <button onclick="goBack()">Exit</button>
+</div>
+
+<script>
+const teams = [
+"Argentina","Brazil","France","England","Spain","Germany",
+"Italy","Portugal","Netherlands","Belgium","Croatia","USA"
+];
+
+const players = [
+"Cristiano Ronaldo","Messi","Neymar","Mbappe","Haaland",
+"Benzema","Modric","De Bruyne","Vinicius Jr","Saka"
+];
+
+// TEAM STRENGTH SYSTEM
+const strength = {
+"Argentina":88,"Brazil":90,"France":91,"England":87,
+"Spain":86,"Germany":85,"Italy":84,"Portugal":86,
+"Netherlands":83,"Belgium":82,"Croatia":80,"USA":75
+};
+
+const teamA = document.getElementById("teamA");
+const teamB = document.getElementById("teamB");
+
+teams.forEach(t=>{
+  let a=document.createElement("option");
+  let b=document.createElement("option");
+  a.text=b.text=t;
+  a.value=b.value=t;
+  teamA.add(a); teamB.add(b);
+});
+
+let scoreA=0, scoreB=0;
+let shotsA=0, shotsB=0;
+let possA=50, possB=50;
+
+function log(msg){
+  const box=document.getElementById("commentary");
+  box.innerHTML += msg + "<br>";
+  box.scrollTop = box.scrollHeight;
+}
+
+function startMatch(){
+
+  const A=teamA.value;
+  const B=teamB.value;
+
+  scoreA=0; scoreB=0;
+  shotsA=0; shotsB=0;
+
+  document.getElementById("overlay").style.display="flex";
+
+  const steps=[
+    "Building Tactical Models...",
+    "Analyzing Formations...",
+    "Simulating Match Engine...",
+    "Injecting Random Chaos...",
+    "Kickoff Ready..."
+  ];
+
+  let i=0;
+
+  const interval=setInterval(()=>{
+    document.getElementById("loadingText").innerText=steps[i++];
+    if(i===steps.length){
+      clearInterval(interval);
+      setTimeout(()=>{
+        document.getElementById("overlay").style.display="none";
+        showScreen("matchScreen");
+        simulateMatch(A,B);
+      },500);
+    }
+  },600);
+}
+
+function simulateMatch(A,B){
+
+  log("Kickoff! " + A + " vs " + B);
+
+  let minute=0;
+
+  const match=setInterval(()=>{
+
+    minute+=5;
+
+    const diff = strength[A]-strength[B];
+
+    possA = 50 + diff/3;
+    possB = 100 - possA;
+
+    let event=Math.random();
+
+    if(event < 0.25){
+      shotsA++;
+      log(`🟡 ${A} attacks in ${minute}'`);
+      if(Math.random() < (0.15 + diff/200)){
+        scoreA++;
+        log(`⚽ GOAL! ${players[Math.floor(Math.random()*players.length)]} (${A}) ${minute}'`);
+      }
+    }
+
+    else if(event < 0.5){
+      shotsB++;
+      log(`🟡 ${B} attacks in ${minute}'`);
+      if(Math.random() < (0.15 - diff/200)){
+        scoreB++;
+        log(`⚽ GOAL! ${players[Math.floor(Math.random()*players.length)]} (${B}) ${minute}'`);
+      }
+    }
+
+    document.getElementById("score").innerText =
+      `${A} ${scoreA} - ${scoreB} ${B}`;
+
+    document.getElementById("stats").innerHTML =
+      `Shots: ${A} ${shotsA} - ${shotsB} ${B}`;
+
+    document.getElementById("possession").innerHTML =
+      `${A}: ${possA.toFixed(1)}% <br> ${B}: ${possB.toFixed(1)}%`;
+
+    if(minute >= 90){
+      clearInterval(match);
+      log("🏁 Full Time!");
+    }
+
+  },400);
+}
+
+function goBack(){
+  showScreen("selectScreen");
+  document.getElementById("commentary").innerHTML="";
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+</script>
+
+</body>
+</html>
