@@ -28,7 +28,7 @@ select, button {
 .overlay {
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.92);
+  background:rgba(0,0,0,0.95);
   display:none;
   justify-content:center;
   align-items:center;
@@ -36,19 +36,16 @@ select, button {
   text-align:center;
 }
 
-.glow { color:#00ffcc; font-size:18px; }
-
-.wc-logo {
+.wc {
   font-size:40px;
   color:#00ffcc;
-  margin-bottom:10px;
-  animation: pulse 1s infinite;
+  animation:pulse 1s infinite;
 }
 
 @keyframes pulse {
-  0% { transform:scale(1); opacity:0.7; }
-  50% { transform:scale(1.2); opacity:1; }
-  100% { transform:scale(1); opacity:0.7; }
+  0%{transform:scale(1);opacity:0.6;}
+  50%{transform:scale(1.2);opacity:1;}
+  100%{transform:scale(1);opacity:0.6;}
 }
 
 .score {
@@ -57,14 +54,18 @@ select, button {
   color:#00ffcc;
 }
 
-.commentary {
-  margin-top:10px;
-  height:220px;
-  overflow:auto;
+.stats {
+  margin-top:15px;
   background:#0b1220;
-  padding:10px;
+  padding:15px;
   border-radius:10px;
-  font-size:14px;
+}
+
+.row {
+  display:flex;
+  justify-content:space-between;
+  margin:6px 0;
+  color:#ccc;
 }
 </style>
 </head>
@@ -72,7 +73,7 @@ select, button {
 <body>
 
 <div id="selectScreen" class="screen active">
-  <h2>⚽ World Cup 2026 Simulator</h2>
+  <h2>🏆 World Cup 2026 Simulator</h2>
 
   <select id="teamA"></select>
   <select id="teamB"></select>
@@ -81,23 +82,24 @@ select, button {
 </div>
 
 <div id="overlay" class="overlay">
-  <div class="wc-logo">🏆 FIFA WORLD CUP 2026</div>
-  <div class="glow" id="loadingText">Initializing AI Engine...</div>
+  <div class="wc">🏆 FIFA WORLD CUP 2026</div>
+  <p id="loadingText">Loading...</p>
 </div>
 
-<div id="matchScreen" class="screen">
+<div id="resultScreen" class="screen">
 
-  <div class="score" id="score">0 - 0</div>
-  <div class="commentary" id="commentary"></div>
+  <div class="score" id="finalScore"></div>
+
+  <div class="stats" id="statsBox"></div>
+
+  <div class="stats" id="goalBox"></div>
 
   <button onclick="goBack()">Back</button>
 </div>
 
 <script>
 
-/* =========================
-   WC 2026 TEAMS (SORTED)
-========================= */
+/* ================= TEAMS ================= */
 
 let teams = [
 "Algeria","Argentina","Australia","Austria","Belgium",
@@ -112,12 +114,9 @@ let teams = [
 "United States","Uruguay","Uzbekistan"
 ];
 
-// SORT A → Z (your requirement)
 teams.sort((a,b)=>a.localeCompare(b));
 
-/* =========================
-   3 PLAYERS PER COUNTRY
-========================= */
+/* ================= PLAYERS ================= */
 
 const players = {
 "Argentina":["Messi","Alvarez","Lautaro Martinez"],
@@ -153,9 +152,6 @@ const players = {
 "Uzbekistan":["Shomurodov","Hamrobekov","Saidov"],
 "Panama":["Torres","Rodriguez","Diaz"],
 "Paraguay":["Almiron","Sanabria","Romero"],
-"Chile":["Vargas","Brereton Diaz","Valdes"],
-"Peru":["Guerrero","Cueva","Lapadula"],
-"Ecuador":["Valencia","Caicedo","Estrada"],
 "Algeria":["Mahrez","Slimani","Bounedjah"],
 "Tunisia":["Msakni","Jaziri","Sliti"],
 "Ghana":["Partey","Ayew","Williams"],
@@ -166,16 +162,10 @@ const players = {
 "Congo DR":["Bakambu","Mbemba","Bolasie"],
 "Curaçao":["Gutiérrez","Bacuna","Janga"],
 "Czechia":["Schick","Soucek","Coufal"],
-"Haiti":["Pascual","Nazon","Pierre"]
+"Haiti":["Nazon","Pierre","Pascual"]
 };
 
-// fallback safety
-function randomPlayer(team){
-  const pool = players[team] || ["Star Player 1","Star Player 2","Star Player 3"];
-  return pool[Math.floor(Math.random()*pool.length)];
-}
-
-/* ========================= */
+/* ================= UI ================= */
 
 const teamA=document.getElementById("teamA");
 const teamB=document.getElementById("teamB");
@@ -189,94 +179,136 @@ teams.forEach(t=>{
   teamB.add(b);
 });
 
+/* ================= MATCH ENGINE ================= */
+
 let scoreA=0, scoreB=0;
 
-function log(msg){
-  const box=document.getElementById("commentary");
-  box.innerHTML += msg + "<br>";
-  box.scrollTop = box.scrollHeight;
+function randomPlayer(team){
+  return players[team][Math.floor(Math.random()*3)];
 }
+
+/* silent simulation (NO commentary) */
+function simulate(A,B){
+
+  scoreA=0; scoreB=0;
+
+  let shotsA=0, shotsB=0;
+  let onA=0, onB=0;
+
+  for(let i=0;i<20;i++){
+
+    let event=Math.random();
+
+    if(event<0.5){
+      shotsA++;
+      if(Math.random()<0.3){
+        onA++;
+        scoreA++;
+      }
+    } else {
+      shotsB++;
+      if(Math.random()<0.3){
+        onB++;
+        scoreB++;
+      }
+    }
+  }
+
+  const possA = Math.floor(40 + Math.random()*20);
+  const possB = 100 - possA;
+
+  const passA = Math.floor(75 + Math.random()*20);
+  const passB = Math.floor(75 + Math.random()*20);
+
+  return {
+    scoreA, scoreB,
+    shotsA, shotsB,
+    onA, onB,
+    possA, possB,
+    passA, passB
+  };
+}
+
+/* ================= FLOW ================= */
 
 function startMatch(){
 
   const A=teamA.value;
   const B=teamB.value;
 
-  scoreA=0; scoreB=0;
-
   document.getElementById("overlay").style.display="flex";
 
   const steps=[
-    "Loading Squad Data...",
-    "Analyzing Formations...",
-    "Connecting to FIFA Simulation Engine...",
-    "Generating Match Physics...",
-    "Kickoff Preparation Complete..."
+    "Loading squads...",
+    "Running tactical AI...",
+    "Building match simulation...",
+    "Finalizing World Cup 2026 engine...",
+    "Kickoff..."
   ];
 
   let i=0;
 
   const interval=setInterval(()=>{
+
     document.getElementById("loadingText").innerText=steps[i++];
 
     if(i===steps.length){
       clearInterval(interval);
 
       setTimeout(()=>{
+
         document.getElementById("overlay").style.display="none";
-        showScreen("matchScreen");
-        simulate(A,B);
-      },800);
+
+        const result = simulate(A,B);
+
+        showResult(A,B,result);
+
+        showScreen("resultScreen");
+
+      },900);
     }
+
   },600);
 }
 
-function simulate(A,B){
+/* ================= RESULT SCREEN ================= */
 
-  log("🏆 FIFA World Cup 2026 Match Started!");
-  log(`⚽ ${A} vs ${B}`);
+function showResult(A,B,r){
 
-  let minute=0;
+  document.getElementById("finalScore").innerText =
+    `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
 
-  const match=setInterval(()=>{
+  let winner =
+    r.scoreA > r.scoreB ? A :
+    r.scoreB > r.scoreA ? B : "Draw";
 
-    minute += Math.floor(Math.random()*10)+1;
+  document.getElementById("statsBox").innerHTML = `
+    <div class="row"><b>Winner</b><span>${winner}</span></div>
+    <div class="row"><b>Possession</b><span>${A} ${r.possA}% - ${r.possB}% ${B}</span></div>
+    <div class="row"><b>Shots</b><span>${A} ${r.shotsA} - ${r.shotsB} ${B}</span></div>
+    <div class="row"><b>Shots on Target</b><span>${A} ${r.onA} - ${r.onB} ${B}</span></div>
+    <div class="row"><b>Pass Accuracy</b><span>${A} ${r.passA}% - ${r.passB}% ${B}</span></div>
+  `;
 
-    if(minute>90){
-      clearInterval(match);
-      log("🏁 Full Time!");
-      return;
-    }
+  let goalsHTML = "<h3>⚽ Goal Scorers</h3>";
 
-    let event=Math.random();
+  let totalGoalsA=r.scoreA;
+  let totalGoalsB=r.scoreB;
 
-    if(event<0.25){
-      if(Math.random()<0.18){
-        scoreA++;
-        log(`⚽ GOAL! ${randomPlayer(A)} (${A}) ${minute}'`);
-      } else {
-        log(`${A} attack at ${minute}'`);
-      }
-    }
+  for(let i=0;i<totalGoalsA;i++){
+    goalsHTML += `<div>⚽ ${randomPlayer(A)} (${A})</div>`;
+  }
+  for(let i=0;i<totalGoalsB;i++){
+    goalsHTML += `<div>⚽ ${randomPlayer(B)} (${B})</div>`;
+  }
 
-    else if(event<0.5){
-      if(Math.random()<0.18){
-        scoreB++;
-        log(`⚽ GOAL! ${randomPlayer(B)} (${B}) ${minute}'`);
-      } else {
-        log(`${B} attack at ${minute}'`);
-      }
-    }
-
-    document.getElementById("score").innerText=
-      `${A} ${scoreA} - ${scoreB} ${B}`;
-
-  },500);
+  document.getElementById("goalBox").innerHTML = goalsHTML;
 }
+
+/* ================= UI ================= */
 
 function goBack(){
   showScreen("selectScreen");
-  document.getElementById("commentary").innerHTML="";
 }
 
 function showScreen(id){
