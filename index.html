@@ -12,15 +12,14 @@ body{
   font-family:Arial,sans-serif;
   background:#050b14;
   color:white;
-  overflow-x:hidden;
 }
 
-/* ================= SXJ INTRO (UPGRADED CINEMATIC) ================= */
+/* ================= SXJ INTRO ================= */
 
 #splashScreen{
   position:fixed;
   inset:0;
-  background: radial-gradient(circle at center, #000 0%, #050b14 100%);
+  background:#000;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -29,28 +28,24 @@ body{
 }
 
 .sxj-logo{
+  color:#FFD700;
   font-size:86px;
   font-weight:900;
   letter-spacing:18px;
-  color:#ffffff;
   opacity:0;
-  transform:scale(0.6);
-  animation:sxjIntro 3s ease forwards;
-  text-shadow:
-    0 0 10px rgba(255,255,255,0.6),
-    0 0 30px rgba(255,255,255,0.4),
-    0 0 80px rgba(255,255,255,0.2);
+  animation:logoIntro 2.8s ease forwards;
+  text-shadow:0 0 25px #FFD700, 0 0 60px #FFD700;
 }
 
 .wind{
   position:absolute;
   width:500px;
-  height:2px;
-  background:linear-gradient(90deg,transparent,white,transparent);
+  height:3px;
+  background:linear-gradient(90deg,transparent,#FFD700,transparent);
   filter:blur(2px);
   left:-600px;
   top:50%;
-  animation:windMove 3s ease forwards;
+  animation:windMove 2.8s ease forwards;
 }
 
 @keyframes windMove{
@@ -59,47 +54,24 @@ body{
   100%{left:120%;opacity:0;}
 }
 
-@keyframes sxjIntro{
-  0%{
-    opacity:0;
-    transform:scale(0.6) rotate(-5deg);
-  }
-  40%{
-    opacity:1;
-    transform:scale(1.05) rotate(0deg);
-  }
-  70%{
-    transform:scale(1);
-    text-shadow:
-      0 0 20px #fff,
-      0 0 60px #fff,
-      0 0 120px #aaa;
-  }
-  100%{
-    opacity:0;
-    transform:scale(1.2);
-  }
+@keyframes logoIntro{
+  0%{opacity:0;transform:scale(0.7);}
+  40%{opacity:1;transform:scale(1.1);}
+  70%{text-shadow:0 0 40px #FFD700;}
+  100%{opacity:0;transform:scale(1.2);}
 }
 
-/* ================= SCREENS ================= */
+/* ================= MAIN ================= */
 
 .screen{
   display:none;
   padding:15px;
   min-height:100vh;
-  box-sizing:border-box;
-  opacity:0;
-  transform:translateY(20px);
-  transition:0.6s ease;
 }
 
-.active{
-  display:block;
-  opacity:1;
-  transform:translateY(0);
-}
+.active{display:block;}
 
-/* ================= INPUTS ================= */
+/* ================= GOLD BUTTONS ================= */
 
 select,
 button{
@@ -107,18 +79,19 @@ button{
   padding:14px;
   margin-top:12px;
   background:#0a0a0a;
-  color:white;
-  border:2px solid #ffffff;
+  color:#FFD700;
+  border:2px solid #FFD700;
   border-radius:10px;
   font-size:16px;
   cursor:pointer;
-  transition:0.2s ease;
-  text-shadow:0 0 8px white;
+  transition:0.2s;
+  text-shadow:0 0 10px #FFD700;
+  box-shadow:0 0 10px rgba(255,215,0,0.3);
 }
 
 button:hover, select:hover{
   transform:scale(1.03);
-  box-shadow:0 0 15px white;
+  box-shadow:0 0 20px #FFD700,0 0 40px rgba(255,215,0,0.3);
 }
 
 button:active, select:active{
@@ -138,9 +111,9 @@ button:active, select:active{
 }
 
 .wc{
+  color:#FFD700;
   font-size:28px;
-  color:white;
-  text-shadow:0 0 20px white;
+  text-shadow:0 0 20px #FFD700;
 }
 
 /* ================= RESULT ================= */
@@ -148,8 +121,8 @@ button:active, select:active{
 .score{
   font-size:34px;
   text-align:center;
-  margin-top:10px;
-  text-shadow:0 0 20px white;
+  color:#FFD700;
+  text-shadow:0 0 20px #FFD700;
 }
 
 .stats,
@@ -158,14 +131,7 @@ button:active, select:active{
   background:#0b1220;
   padding:12px;
   border-radius:12px;
-  border:1px solid rgba(255,255,255,0.2);
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  font-size:14px;
+  border:1px solid rgba(255,215,0,0.3);
 }
 
 /* ================= POSSESSION BAR ================= */
@@ -176,45 +142,41 @@ button:active, select:active{
   background:#111;
   border-radius:20px;
   overflow:hidden;
-  margin-top:10px;
 }
 
 .fillA{
   height:100%;
-  background:white;
-  box-shadow:0 0 10px white;
+  background:#FFD700;
+  box-shadow:0 0 15px #FFD700;
   width:0%;
-  transition:2s ease;
+  transition:2s;
 }
 
-.fillB{
-  height:100%;
-  background:#666;
-  width:0%;
-  transition:2s ease;
-  float:right;
+/* ================= MOBILE ================= */
+
+@media(max-width:600px){
+  .sxj-logo{font-size:54px;}
 }
-  </style>
+
+</style>
 </head>
 
 <body>
 
-<!-- SXJ INTRO -->
+<!-- SXJ -->
 <div id="splashScreen">
   <div class="wind"></div>
   <div class="sxj-logo">SXJ</div>
 </div>
 
-<!-- SELECT SCREEN -->
+<!-- SELECT -->
 <div id="selectScreen" class="screen">
-
   <h2>🏆 World Cup 2026 Simulator</h2>
 
   <select id="teamA"></select>
   <select id="teamB"></select>
 
   <button onclick="startMatch()">START MATCH</button>
-
 </div>
 
 <!-- OVERLAY -->
@@ -228,7 +190,6 @@ button:active, select:active{
 
   <div class="score" id="finalScore"></div>
 
-  <!-- POSSESSION BAR -->
   <div class="bar">
     <div id="barA" class="fillA"></div>
   </div>
@@ -239,36 +200,49 @@ button:active, select:active{
   <button onclick="goBack()">Back</button>
 
 </div>
+
 <script>
 
-/* ================= WC 2026 TEAMS (SORTED A-Z) ================= */
+/* ================= 48 TEAMS ================= */
 
 let teams = [
 "Argentina","Brazil","France","England","Spain","Germany","Italy",
 "Portugal","Netherlands","Belgium","Croatia","Morocco","Japan",
 "Mexico","Canada","United States","Uruguay","Colombia","Switzerland",
-"Norway","Türkiye","Qatar","Saudi Arabia","Australia","New Zealand",
-"Korea Republic","IR Iran","Iraq","Uzbekistan","Algeria","Austria",
-"Senegal","Egypt","Ghana","Denmark","Poland","Serbia","Ukraine",
-"Cameroon","Nigeria","Costa Rica","Panama","Ecuador","Paraguay",
-"Chile","Peru","Tunisia","South Africa"
+"Norway","Denmark","Sweden","Austria","Poland","Serbia","Ukraine",
+"Türkiye","IR Iran","Qatar","Saudi Arabia","Australia","New Zealand",
+"Senegal","Egypt","Ghana","Nigeria","Cameroon","South Africa",
+"Algeria","Tunisia","Ecuador","Peru","Chile","Paraguay",
+"Costa Rica","Panama","Congo DR","Iraq"
 ];
 
-teams.sort((a,b)=>a.localeCompare(b));
+teams.sort();
 
-/* ================= PLAYERS (UNCHANGED IDEA) ================= */
+/* ================= 3 PLAYERS EACH ================= */
 
 const players = {
-"Argentina":["Messi","Alvarez","Lautaro"],
-"Brazil":["Vinicius","Rodrygo","Richarlison"],
-"France":["Mbappe","Griezmann","Thuram"],
-"England":["Kane","Saka","Foden"],
-"Spain":["Morata","Pedri","Yamal"],
-"Germany":["Musiala","Havertz","Kimmich"],
-"Portugal":["Ronaldo","Bruno","Leao"]
+
+"Argentina":[["Messi",0.5],["Alvarez",0.3],["Lautaro",0.2]],
+"Brazil":[["Vinicius",0.5],["Rodrygo",0.3],["Richarlison",0.2]],
+"France":[["Mbappe",0.6],["Griezmann",0.25],["Thuram",0.15]],
+"England":[["Kane",0.6],["Saka",0.25],["Foden",0.15]],
+"Spain":[["Morata",0.4],["Yamal",0.35],["Pedri",0.25]],
+"Germany":[["Musiala",0.5],["Havertz",0.3],["Kimmich",0.2]],
+"Portugal":[["Ronaldo",0.6],["Leao",0.25],["Bruno",0.15]],
+
+"Congo DR":[["Bakambu",0.5],["Mbemba",0.3],["Bolasie",0.2]],
+"Iraq":[["Ali Jasim",0.5],["Aymen Hussein",0.3],["Adnan",0.2]]
+
 };
 
-/* ================= SETUP ================= */
+/* fallback */
+function getPlayers(team){
+  return players[team] || [
+    ["Player1",0.5],["Player2",0.3],["Player3",0.2]
+  ];
+}
+
+/* ================= UI ================= */
 
 const teamA=document.getElementById("teamA");
 const teamB=document.getElementById("teamB");
@@ -282,23 +256,28 @@ teams.forEach(t=>{
   teamB.add(b);
 });
 
-/* ================= HELPERS ================= */
-
-function randomPlayer(team){
-  return players[team]?.[Math.floor(Math.random()*3)] || "Player";
-}
-
-/* ================= SIM ENGINE ================= */
+/* ================= SIM ================= */
 
 function simulate(A,B){
 
   let scoreA=Math.floor(Math.random()*4);
   let scoreB=Math.floor(Math.random()*4);
 
-  let possA=Math.round(50+Math.random()*30);
-  let possB=100-possA;
+  let possA=Math.round(40+Math.random()*30);
 
-  return {scoreA,scoreB,possA,possB};
+  return {scoreA,scoreB,possA};
+}
+
+/* weighted scorer */
+function pickScorer(team){
+
+  let list=getPlayers(team);
+
+  let r=Math.random();
+
+  if(r<list[0][1]) return list[0][0];
+  if(r<list[0][1]+list[1][1]) return list[1][0];
+  return list[2][0];
 }
 
 /* ================= MATCH ================= */
@@ -319,29 +298,22 @@ function startMatch(){
     document.getElementById("finalScore").innerText=
       `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
 
-    /* POSSESSION BAR ANIMATE */
     document.getElementById("barA").style.width=r.possA+"%";
 
-    /* STATS */
-    document.getElementById("statsBox").innerHTML=`
-      <div class="row"><b>Possession</b><span>${r.possA}% - ${r.possB}%</span></div>
-      <div class="row"><b>Shots</b><span>${Math.floor(Math.random()*10)} - ${Math.floor(Math.random()*10)}</span></div>
-      <div class="row"><b>Shots On Target</b><span>${Math.floor(Math.random()*6)} - ${Math.floor(Math.random()*6)}</span></div>
-    `;
-
-    /* GOAL SCORERS (TOP 3 ONLY) */
     let goals=[];
 
-    for(let i=0;i<r.scoreA;i++){
-      goals.push(`⚽ ${randomPlayer(A)} (${A})`);
-    }
+    for(let i=0;i<r.scoreA;i++)
+      goals.push(`⚽ ${pickScorer(A)} (${A})`);
 
-    for(let i=0;i<r.scoreB;i++){
-      goals.push(`⚽ ${randomPlayer(B)} (${B})`);
-    }
+    for(let i=0;i<r.scoreB;i++)
+      goals.push(`⚽ ${pickScorer(B)} (${B})`);
+
+    document.getElementById("statsBox").innerHTML=`
+      <div>Possession: ${r.possA}% - ${100-r.possA}%</div>
+    `;
 
     document.getElementById("goalBox").innerHTML=
-      "<b>Goals</b><br><br>"+goals.join("<br>");
+      "<b>Goals</b><br>"+goals.join("<br>");
 
     showScreen("resultScreen");
 
@@ -355,18 +327,14 @@ function showScreen(id){
   document.getElementById(id).classList.add("active");
 }
 
-function goBack(){
-  showScreen("selectScreen");
-}
+function goBack(){showScreen("selectScreen");}
 
-/* ================= INTRO ================= */
-
-window.addEventListener("load",()=>{
+window.onload=()=>{
   setTimeout(()=>{
     document.getElementById("splashScreen").style.display="none";
     showScreen("selectScreen");
   },3000);
-});
+};
 
 </script>
 
