@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>World Cup 2026 Simulator</title>
 
 <style>
@@ -12,60 +13,111 @@ body {
   color: white;
 }
 
-.screen { display:none; padding:20px; height:100vh; }
-.active { display:block; }
+/* SCREEN */
+.screen {
+  display: none;
+  padding: 15px;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+.active { display: block; }
 
+/* INPUTS */
 select, button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  background:#111;
-  border:1px solid #00ffcc;
-  color:white;
-  border-radius:8px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  background: #111;
+  border: 1px solid #00ffcc;
+  color: white;
+  border-radius: 10px;
+  font-size: 16px;
 }
 
+/* BIG TOUCH BUTTONS */
+button {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* OVERLAY */
 .overlay {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.95);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 20px;
 }
 
 .wc {
-  font-size:40px;
-  color:#00ffcc;
-  animation:pulse 1s infinite;
+  font-size: 28px;
+  color: #00ffcc;
+  animation: pulse 1s infinite;
 }
 
 @keyframes pulse {
-  0%{transform:scale(1);opacity:0.6;}
-  50%{transform:scale(1.2);opacity:1;}
-  100%{transform:scale(1);opacity:0.6;}
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.6; }
 }
 
+/* SCORE */
 .score {
-  font-size:42px;
-  text-align:center;
-  color:#00ffcc;
+  font-size: 34px;
+  text-align: center;
+  color: #00ffcc;
+  margin-top: 10px;
 }
 
+/* STATS CARD */
 .stats {
-  margin-top:15px;
-  background:#0b1220;
-  padding:15px;
-  border-radius:10px;
+  margin-top: 12px;
+  background: #0b1220;
+  padding: 12px;
+  border-radius: 12px;
 }
 
 .row {
-  display:flex;
-  justify-content:space-between;
-  margin:6px 0;
-  color:#ccc;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 14px;
+  color: #ddd;
+}
+
+/* GOALS */
+.goalBox {
+  margin-top: 12px;
+  background: #0b1220;
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* MOBILE OPTIMIZATION */
+@media (max-width: 600px) {
+
+  .wc {
+    font-size: 22px;
+  }
+
+  .score {
+    font-size: 28px;
+  }
+
+  .row {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  select, button {
+    font-size: 15px;
+    padding: 12px;
+  }
 }
 </style>
 </head>
@@ -83,7 +135,7 @@ select, button {
 
 <div id="overlay" class="overlay">
   <div class="wc">🏆 FIFA WORLD CUP 2026</div>
-  <p id="loadingText">Loading...</p>
+  <p id="loadingText">Loading Engine...</p>
 </div>
 
 <div id="resultScreen" class="screen">
@@ -92,14 +144,14 @@ select, button {
 
   <div class="stats" id="statsBox"></div>
 
-  <div class="stats" id="goalBox"></div>
+  <div class="goalBox" id="goalBox"></div>
 
   <button onclick="goBack()">Back</button>
 </div>
 
 <script>
 
-/* ================= TEAMS ================= */
+/* ===== TEAMS (same system) ===== */
 
 let teams = [
 "Algeria","Argentina","Australia","Austria","Belgium",
@@ -116,7 +168,7 @@ let teams = [
 
 teams.sort((a,b)=>a.localeCompare(b));
 
-/* ================= PLAYERS ================= */
+/* ===== PLAYERS ===== */
 
 const players = {
 "Argentina":["Messi","Alvarez","Lautaro Martinez"],
@@ -165,7 +217,7 @@ const players = {
 "Haiti":["Nazon","Pierre","Pascual"]
 };
 
-/* ================= UI ================= */
+/* ===== UI ===== */
 
 const teamA=document.getElementById("teamA");
 const teamB=document.getElementById("teamB");
@@ -179,15 +231,12 @@ teams.forEach(t=>{
   teamB.add(b);
 });
 
-/* ================= MATCH ENGINE ================= */
-
-let scoreA=0, scoreB=0;
-
 function randomPlayer(team){
   return players[team][Math.floor(Math.random()*3)];
 }
 
-/* silent simulation (NO commentary) */
+let scoreA=0, scoreB=0;
+
 function simulate(A,B){
 
   scoreA=0; scoreB=0;
@@ -197,20 +246,14 @@ function simulate(A,B){
 
   for(let i=0;i<20;i++){
 
-    let event=Math.random();
+    let e=Math.random();
 
-    if(event<0.5){
+    if(e<0.5){
       shotsA++;
-      if(Math.random()<0.3){
-        onA++;
-        scoreA++;
-      }
+      if(Math.random()<0.3){ scoreA++; onA++; }
     } else {
       shotsB++;
-      if(Math.random()<0.3){
-        onB++;
-        scoreB++;
-      }
+      if(Math.random()<0.3){ scoreB++; onB++; }
     }
   }
 
@@ -220,16 +263,10 @@ function simulate(A,B){
   const passA = Math.floor(75 + Math.random()*20);
   const passB = Math.floor(75 + Math.random()*20);
 
-  return {
-    scoreA, scoreB,
-    shotsA, shotsB,
-    onA, onB,
-    possA, possB,
-    passA, passB
-  };
+  return {scoreA,scoreB,shotsA,shotsB,onA,onB,possA,possB,passA,passB};
 }
 
-/* ================= FLOW ================= */
+/* ===== FLOW ===== */
 
 function startMatch(){
 
@@ -240,9 +277,9 @@ function startMatch(){
 
   const steps=[
     "Loading squads...",
-    "Running tactical AI...",
-    "Building match simulation...",
-    "Finalizing World Cup 2026 engine...",
+    "AI Tactical Engine...",
+    "World Cup Simulation...",
+    "Finalizing match...",
     "Kickoff..."
   ];
 
@@ -259,53 +296,31 @@ function startMatch(){
 
         document.getElementById("overlay").style.display="none";
 
-        const result = simulate(A,B);
+        const r = simulate(A,B);
 
-        showResult(A,B,result);
+        document.getElementById("finalScore").innerText =
+          `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
+
+        document.getElementById("statsBox").innerHTML = `
+          <div class="row"><b>Possession</b><span>${r.possA}% - ${r.possB}%</span></div>
+          <div class="row"><b>Shots</b><span>${r.shotsA} - ${r.shotsB}</span></div>
+          <div class="row"><b>Shots on Target</b><span>${r.onA} - ${r.onB}</span></div>
+          <div class="row"><b>Pass Accuracy</b><span>${r.passA}% - ${r.passB}%</span></div>
+        `;
+
+        let goals="⚽ Goals:\n";
+        for(let i=0;i<r.scoreA;i++) goals+=randomPlayer(A)+" ("+A+")\n";
+        for(let i=0;i<r.scoreB;i++) goals+=randomPlayer(B)+" ("+B+")\n";
+
+        document.getElementById("goalBox").innerText = goals;
 
         showScreen("resultScreen");
 
-      },900);
+      },800);
     }
 
-  },600);
+  },500);
 }
-
-/* ================= RESULT SCREEN ================= */
-
-function showResult(A,B,r){
-
-  document.getElementById("finalScore").innerText =
-    `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
-
-  let winner =
-    r.scoreA > r.scoreB ? A :
-    r.scoreB > r.scoreA ? B : "Draw";
-
-  document.getElementById("statsBox").innerHTML = `
-    <div class="row"><b>Winner</b><span>${winner}</span></div>
-    <div class="row"><b>Possession</b><span>${A} ${r.possA}% - ${r.possB}% ${B}</span></div>
-    <div class="row"><b>Shots</b><span>${A} ${r.shotsA} - ${r.shotsB} ${B}</span></div>
-    <div class="row"><b>Shots on Target</b><span>${A} ${r.onA} - ${r.onB} ${B}</span></div>
-    <div class="row"><b>Pass Accuracy</b><span>${A} ${r.passA}% - ${r.passB}% ${B}</span></div>
-  `;
-
-  let goalsHTML = "<h3>⚽ Goal Scorers</h3>";
-
-  let totalGoalsA=r.scoreA;
-  let totalGoalsB=r.scoreB;
-
-  for(let i=0;i<totalGoalsA;i++){
-    goalsHTML += `<div>⚽ ${randomPlayer(A)} (${A})</div>`;
-  }
-  for(let i=0;i<totalGoalsB;i++){
-    goalsHTML += `<div>⚽ ${randomPlayer(B)} (${B})</div>`;
-  }
-
-  document.getElementById("goalBox").innerHTML = goalsHTML;
-}
-
-/* ================= UI ================= */
 
 function goBack(){
   showScreen("selectScreen");
