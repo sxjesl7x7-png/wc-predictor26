@@ -7,7 +7,7 @@
 
 <style>
 
-/* ================= GLOBAL THEME ================= */
+/* ================= GLOBAL ================= */
 
 body{
   margin:0;
@@ -26,109 +26,104 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:99999;
-  overflow:hidden;
+  z-index:9999;
 }
 
-.sxj-logo{
+.sxj{
   font-size:70px;
   font-weight:900;
-  letter-spacing:12px;
+  letter-spacing:14px;
   color:#fff;
-  opacity:0;
-  animation:logoAnim 2.5s ease forwards;
+  animation:sxjAnim 2.2s ease forwards;
 }
 
+@keyframes sxjAnim{
+  0%{opacity:0; transform:scale(0.8);}
+  40%{opacity:1; transform:scale(1.1);}
+  70%{text-shadow:0 0 25px #fff;}
+  100%{opacity:0; transform:scale(1.2);}
+}
+
+/* wind effect */
 .wind{
   position:absolute;
   width:300px;
   height:3px;
   background:#fff;
   filter:blur(4px);
-  left:-400px;
-  top:50%;
-  animation:windMove 2.5s ease forwards;
+  animation:windMove 2.2s ease forwards;
 }
 
 @keyframes windMove{
-  0%{left:-400px;opacity:0;}
-  20%{opacity:1;}
-  100%{left:120%;opacity:0;}
+  0%{left:-400px; opacity:0;}
+  30%{opacity:1;}
+  100%{left:120%; opacity:0;}
 }
 
-@keyframes logoAnim{
-  0%{opacity:0;transform:translateX(-80px);}
-  40%{opacity:1;transform:translateX(0);}
-  70%{text-shadow:0 0 20px #fff;}
-  100%{opacity:0;transform:scale(1.1);}
-}
-
-/* ================= SCREEN SYSTEM ================= */
+/* ================= SCREEN SYSTEM (FIXED SMOOTH) ================= */
 
 .screen{
   display:none;
   min-height:100vh;
   padding:16px;
   box-sizing:border-box;
-
-  opacity:0;
-  transform:scale(1.05);
-  filter:blur(20px);
-  transition:all 0.8s ease;
 }
 
 .screen.active{
   display:block;
-  opacity:1;
-  transform:scale(1);
-  filter:blur(0);
+  animation:fadeIn 0.7s ease;
 }
 
-/* ================= INPUTS ================= */
+@keyframes fadeIn{
+  from{
+    opacity:0;
+    transform:scale(1.04);
+    filter:blur(12px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1);
+    filter:blur(0);
+  }
+}
 
-select,button{
+/* ================= GOLD THEME BUTTONS ================= */
+
+button, select{
   width:100%;
   padding:14px;
   margin-top:12px;
-  border-radius:10px;
+
   background:#000;
   color:#fff;
-  border:1px solid #ffffff40;
+
+  border:2px solid #d4af37; /* GOLD */
+  border-radius:10px;
+
   font-size:16px;
-  transition:0.25s ease;
-}
-
-/* ================= BUTTON ANIMATION ================= */
-
-button{
   cursor:pointer;
-  position:relative;
-  overflow:hidden;
+
+  transition:0.25s ease;
+
+  text-shadow:0 0 6px rgba(255,255,255,0.6);
 }
 
-button:hover{
-  box-shadow:0 0 15px #fff;
+/* hover */
+button:hover, select:hover{
   transform:scale(1.03);
+  box-shadow:0 0 14px #d4af37;
 }
 
-button:active{
-  transform:scale(0.95);
+/* click */
+button:active, select:active{
+  transform:scale(0.96);
+  box-shadow:0 0 6px #d4af37;
 }
 
-/* shine effect */
-button::before{
-  content:"";
-  position:absolute;
-  top:0;
-  left:-120%;
-  width:120%;
-  height:100%;
-  background:linear-gradient(120deg,transparent,#ffffff30,transparent);
-}
-
-button:hover::before{
-  left:120%;
-  transition:0.6s;
+/* dropdown options */
+option{
+  background:#000;
+  color:#fff;
 }
 
 /* ================= OVERLAY ================= */
@@ -144,24 +139,42 @@ button:hover::before{
 }
 
 .wc{
-  font-size:28px;
+  font-size:26px;
   color:#fff;
   animation:pulse 1s infinite;
 }
 
 @keyframes pulse{
-  0%{transform:scale(1);opacity:0.6;}
+  0%{transform:scale(1);opacity:0.5;}
   50%{transform:scale(1.1);opacity:1;}
-  100%{transform:scale(1);opacity:0.6;}
+  100%{transform:scale(1);opacity:0.5;}
 }
 
-/* ================= RESULT ================= */
+/* ================= RESULT STYLING ================= */
 
 .score{
   font-size:34px;
   text-align:center;
   margin-top:10px;
   text-shadow:0 0 10px #fff;
+}
+
+/* FIXED ROW SYSTEM (IMPORTANT) */
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid #ffffff15;
+}
+
+.row b{
+  color:#fff;
+}
+
+.row span{
+  color:#00ffcc;
+  font-weight:600;
 }
 
 .stats,.goalBox{
@@ -174,7 +187,7 @@ button:hover::before{
 /* ================= MOBILE ================= */
 
 @media(max-width:600px){
-  .sxj-logo{font-size:50px;}
+  .sxj{font-size:50px;}
 }
 
 </style>
@@ -185,10 +198,10 @@ button:hover::before{
 <!-- ================= SXJ INTRO ================= -->
 <div id="splashScreen">
   <div class="wind"></div>
-  <div class="sxj-logo">SXJ</div>
+  <div class="sxj">SXJ</div>
 </div>
 
-<!-- ================= HOME SCREEN ================= -->
+<!-- ================= HOME ================= -->
 <div id="selectScreen" class="screen">
 
   <h2>🏆 World Cup 2026 Simulator</h2>
@@ -202,27 +215,26 @@ button:hover::before{
 
 <!-- ================= LOADING ================= -->
 <div id="overlay" class="overlay">
-
   <div class="wc">🏆 FIFA WORLD CUP 2026</div>
   <p id="loadingText">Loading...</p>
-
 </div>
 
 <!-- ================= RESULT ================= -->
 <div id="resultScreen" class="screen">
 
   <div class="score" id="finalScore"></div>
+
   <div class="stats" id="statsBox"></div>
+
   <div class="goalBox" id="goalBox"></div>
 
   <button onclick="goBack()">Back</button>
 
 </div>
-<script>
 
 /* ================= 48 TEAMS ================= */
 
-let teams = [
+const teams = [
 "Algeria","Argentina","Australia","Austria","Belgium",
 "Bosnia and Herzegovina","Brazil","Cabo Verde","Canada","Colombia",
 "Congo DR","Côte d'Ivoire","Croatia","Curaçao","Czechia",
@@ -235,9 +247,8 @@ let teams = [
 "United States","Uruguay","Uzbekistan"
 ];
 
-teams.sort((a,b)=>a.localeCompare(b));
-
-/* ================= TEAM STRENGTH ================= */
+/* ================= TEAM STRENGTH SYSTEM ================= */
+/* (Higher = stronger, used to bias results realistically) */
 
 const teamStats = {
 
@@ -293,13 +304,15 @@ const teamStats = {
 "Tunisia":[76,75,75]
 };
 
+/* ================= GET STRENGTH ================= */
+
 function getStrength(team){
   if(!teamStats[team]) return 75;
   let [a,m,d] = teamStats[team];
   return (a+m+d)/3;
 }
 
-/* ================= PLAYERS (ONLY 3 PER TEAM RULE) ================= */
+/* ================= PLAYERS (ONLY 3 PER COUNTRY RULE) ================= */
 
 const players = {
 
@@ -309,6 +322,7 @@ const players = {
 "England":["Kane","Saka","Foden"],
 "Spain":["Morata","Pedri","Yamal"],
 "Germany":["Musiala","Havertz","Kimmich"],
+"Italy":["Chiesa","Barella","Raspadori"],
 "Portugal":["Ronaldo","Bruno Fernandes","Nuno Mendes"],
 "Netherlands":["Depay","Gakpo","Simons"],
 "Belgium":["De Bruyne","Lukaku","Doku"],
@@ -354,26 +368,35 @@ const players = {
 "Tunisia":["Msakni","Jaziri","Sliti"]
 };
 
-/* ================= UI SETUP ================= */
+/* ================= DROPDOWN SETUP ================= */
 
 const teamA = document.getElementById("teamA");
 const teamB = document.getElementById("teamB");
 
+/* alphabetical order already ensured */
+
+teams.sort((a,b)=>a.localeCompare(b));
+
 teams.forEach(t=>{
-  let a=document.createElement("option");
-  let b=document.createElement("option");
-  a.text=b.text=t;
-  a.value=b.value=t;
+  let a = document.createElement("option");
+  let b = document.createElement("option");
+
+  a.text = b.text = t;
+  a.value = b.value = t;
+
   teamA.add(a);
   teamB.add(b);
 });
 
-function randomPlayer(team){
-  return players[team][Math.floor(Math.random()*3)] || "Player";
-}
-  /* ================= MATCH ENGINE ================= */
+/* ================= RANDOM PLAYER ================= */
 
-function simulate(A,B){
+function randomPlayer(team){
+  return players[team]?.[Math.floor(Math.random()*3)] || "Player";
+}
+
+/* ================= MATCH SIMULATION ENGINE ================= */
+
+function simulate(A, B){
 
   let strengthA = getStrength(A);
   let strengthB = getStrength(B);
@@ -381,44 +404,50 @@ function simulate(A,B){
   let scoreA = 0;
   let scoreB = 0;
 
-  let advantage = strengthA - strengthB;
+  let diff = strengthA - strengthB;
 
-  let baseA = strengthA / 25;
-  let baseB = strengthB / 25;
+  /* base scoring probability (balanced but realistic) */
+  let baseA = strengthA / 28;
+  let baseB = strengthB / 28;
 
-  scoreA = Math.round((Math.random() * baseA) + (advantage > 0 ? advantage/22 : 0));
-  scoreB = Math.round((Math.random() * baseB) + (advantage < 0 ? Math.abs(advantage)/22 : 0));
+  scoreA = Math.round(Math.random() * baseA + (diff > 0 ? diff / 24 : 0));
+  scoreB = Math.round(Math.random() * baseB + (diff < 0 ? Math.abs(diff) / 24 : 0));
 
-  /* upset control (strong teams win more often) */
+  /* upset control (prevents absurd 6-0 weak wins) */
 
-  if(strengthA - strengthB > 15){
-    if(scoreB > scoreA) scoreB = Math.max(0, scoreA - 1);
+  if(diff > 15 && scoreB > scoreA){
+    scoreB = Math.max(0, scoreA - 1);
   }
 
-  if(strengthB - strengthA > 15){
-    if(scoreA > scoreB) scoreA = Math.max(0, scoreB - 1);
+  if(diff < -15 && scoreA > scoreB){
+    scoreA = Math.max(0, scoreB - 1);
   }
 
-  /* stats */
+  /* ================= MATCH STATS ================= */
 
-  let possA = Math.round((strengthA/(strengthA+strengthB))*100);
+  let possA = Math.round((strengthA / (strengthA + strengthB)) * 100);
   let possB = 100 - possA;
 
-  let shotsA = Math.floor(scoreA*3 + Math.random()*6 + 4);
-  let shotsB = Math.floor(scoreB*3 + Math.random()*6 + 4);
+  let shotsA = Math.floor(scoreA * 3 + Math.random() * 6 + 3);
+  let shotsB = Math.floor(scoreB * 3 + Math.random() * 6 + 3);
 
-  let onTargetA = Math.max(scoreA, Math.floor(shotsA*0.5));
-  let onTargetB = Math.max(scoreB, Math.floor(shotsB*0.5));
+  let onTargetA = Math.max(scoreA, Math.floor(shotsA * 0.5));
+  let onTargetB = Math.max(scoreB, Math.floor(shotsB * 0.5));
 
-  let passesA = Math.floor(250 + possA*4 + Math.random()*60);
-  let passesB = Math.floor(250 + possB*4 + Math.random()*60);
+  let passesA = Math.floor(260 + possA * 4 + Math.random() * 50);
+  let passesB = Math.floor(260 + possB * 4 + Math.random() * 50);
 
   return {
-    scoreA, scoreB,
-    possA, possB,
-    shotsA, shotsB,
-    onTargetA, onTargetB,
-    passesA, passesB
+    scoreA,
+    scoreB,
+    possA,
+    possB,
+    shotsA,
+    shotsB,
+    onTargetA,
+    onTargetB,
+    passesA,
+    passesB
   };
 }
 
@@ -433,9 +462,10 @@ function startMatch(){
 
   const steps = [
     "Loading squads...",
-    "Analyzing attack...",
-    "Analyzing midfield...",
-    "Analyzing defense...",
+    "Analyzing attack strength...",
+    "Analyzing midfield control...",
+    "Analyzing defense structure...",
+    "Calculating match probability...",
     "Running World Cup simulation...",
     "Finalizing result..."
   ];
@@ -455,17 +485,38 @@ function startMatch(){
 
         document.getElementById("overlay").style.display = "none";
 
-        let r = simulate(A,B);
+        let r = simulate(A, B);
+
+        /* ================= FINAL SCORE ================= */
 
         document.getElementById("finalScore").innerText =
           `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
 
+        /* ================= FIXED STATS UI ================= */
+
         document.getElementById("statsBox").innerHTML = `
-          <div class="row"><b>Possession</b><span>${r.possA}% - ${r.possB}%</span></div>
-          <div class="row"><b>Shots</b><span>${r.shotsA} - ${r.shotsB}</span></div>
-          <div class="row"><b>On Target</b><span>${r.onTargetA} - ${r.onTargetB}</span></div>
-          <div class="row"><b>Passes</b><span>${r.passesA} - ${r.passesB}</span></div>
+          <div class="row">
+            <b>Possession</b>
+            <span>${r.possA}% - ${r.possB}%</span>
+          </div>
+
+          <div class="row">
+            <b>Shots</b>
+            <span>${r.shotsA} - ${r.shotsB}</span>
+          </div>
+
+          <div class="row">
+            <b>Shots on Target</b>
+            <span>${r.onTargetA} - ${r.onTargetB}</span>
+          </div>
+
+          <div class="row">
+            <b>Passes Completed</b>
+            <span>${r.passesA} - ${r.passesB}</span>
+          </div>
         `;
+
+        /* ================= GOALS ================= */
 
         let goals = [];
 
@@ -479,8 +530,10 @@ function startMatch(){
 
         goals.sort(()=>Math.random()-0.5);
 
-        document.getElementById("goalBox").innerHTML =
-          "<b>Goals</b><br><br>" + goals.join("<br>");
+        document.getElementById("goalBox").innerHTML = `
+          <b>Goalscorers</b><br><br>
+          ${goals.join("<br>")}
+        `;
 
         showScreen("resultScreen");
 
@@ -490,11 +543,7 @@ function startMatch(){
   },500);
 }
 
-/* ================= SCREEN SWITCH ================= */
-
-function goBack(){
-  showScreen("selectScreen");
-}
+/* ================= SCREEN SWITCH FIX ================= */
 
 function showScreen(id){
 
@@ -502,32 +551,34 @@ function showScreen(id){
     s.classList.remove("active");
   });
 
-  const el = document.getElementById(id);
+  let el = document.getElementById(id);
   el.classList.add("active");
 
-  /* trigger blur-to-clear animation */
-  setTimeout(()=>{
-    el.style.opacity = "1";
-  },50);
 }
 
-/* ================= SXJ STARTUP ================= */
+/* ================= BACK BUTTON ================= */
+
+function goBack(){
+  showScreen("selectScreen");
+}
+
+/* ================= SXJ SPLASH CONTROL ================= */
 
 window.addEventListener("load",()=>{
 
-  const splash = document.getElementById("splashScreen");
-
   setTimeout(()=>{
 
-    splash.style.opacity = "0";
+    let splash = document.getElementById("splashScreen");
+
     splash.style.transition = "0.6s ease";
+    splash.style.opacity = "0";
 
     setTimeout(()=>{
       splash.style.display = "none";
       showScreen("selectScreen");
     },600);
 
-  },2500);
+  },2200);
 
 });
 
