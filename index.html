@@ -13,7 +13,6 @@ body {
   color: white;
 }
 
-/* SCREEN */
 .screen {
   display: none;
   padding: 15px;
@@ -22,7 +21,6 @@ body {
 }
 .active { display: block; }
 
-/* INPUTS */
 select, button {
   width: 100%;
   padding: 14px;
@@ -34,13 +32,6 @@ select, button {
   font-size: 16px;
 }
 
-/* BIG TOUCH BUTTONS */
-button {
-  font-weight: bold;
-  cursor: pointer;
-}
-
-/* OVERLAY */
 .overlay {
   position: fixed;
   inset: 0;
@@ -50,7 +41,6 @@ button {
   align-items: center;
   flex-direction: column;
   text-align: center;
-  padding: 20px;
 }
 
 .wc {
@@ -65,7 +55,6 @@ button {
   100% { transform: scale(1); opacity: 0.6; }
 }
 
-/* SCORE */
 .score {
   font-size: 34px;
   text-align: center;
@@ -73,8 +62,7 @@ button {
   margin-top: 10px;
 }
 
-/* STATS CARD */
-.stats {
+.stats, .goalBox {
   margin-top: 12px;
   background: #0b1220;
   padding: 12px;
@@ -89,34 +77,10 @@ button {
   color: #ddd;
 }
 
-/* GOALS */
-.goalBox {
-  margin-top: 12px;
-  background: #0b1220;
-  padding: 12px;
-  border-radius: 12px;
-  font-size: 14px;
-}
-
-/* MOBILE OPTIMIZATION */
 @media (max-width: 600px) {
-
-  .wc {
-    font-size: 22px;
-  }
-
-  .score {
-    font-size: 28px;
-  }
-
   .row {
     flex-direction: column;
     gap: 3px;
-  }
-
-  select, button {
-    font-size: 15px;
-    padding: 12px;
   }
 }
 </style>
@@ -151,7 +115,7 @@ button {
 
 <script>
 
-/* ===== TEAMS (same system) ===== */
+/* ================= TEAMS ================= */
 
 let teams = [
 "Algeria","Argentina","Australia","Austria","Belgium",
@@ -168,7 +132,49 @@ let teams = [
 
 teams.sort((a,b)=>a.localeCompare(b));
 
-/* ===== PLAYERS ===== */
+/* ================= TEAM STRENGTH SYSTEM ================= */
+
+const teamStats = {
+"Argentina":[92,88,86],
+"Brazil":[91,87,85],
+"France":[93,89,88],
+"England":[90,86,85],
+"Spain":[88,90,86],
+"Germany":[87,88,86],
+"Italy":[85,86,88],
+"Portugal":[87,85,83],
+"Netherlands":[86,85,84],
+"Belgium":[85,86,83],
+"Croatia":[84,85,82],
+"Morocco":[82,83,84],
+"Japan":[80,82,81],
+"Mexico":[78,79,78],
+"Canada":[76,77,75],
+"USA":[80,79,78],
+"Egypt":[79,78,77],
+"Senegal":[83,82,81],
+"Uruguay":[85,84,83],
+"Colombia":[83,82,81],
+"Switzerland":[82,83,82],
+"Norway":[84,82,80],
+"Türkiye":[81,82,80],
+"Qatar":[75,76,75],
+"Saudi Arabia":[76,75,74],
+"Australia":[77,76,75],
+"New Zealand":[73,72,72],
+"South Korea":[82,83,81],
+"IR Iran":[80,79,78],
+"Iraq":[74,73,72],
+"Uzbekistan":[75,74,73]
+};
+
+function getStrength(team){
+  if(!teamStats[team]) return 75;
+  let [a,m,d] = teamStats[team];
+  return (a+m+d)/3;
+}
+
+/* ================= PLAYERS ================= */
 
 const players = {
 "Argentina":["Messi","Alvarez","Lautaro Martinez"],
@@ -201,23 +207,10 @@ const players = {
 "South Korea":["Son","Hwang Hee-chan","Lee Kang-in"],
 "IR Iran":["Taremi","Azmoun","Ghoddos"],
 "Iraq":["Adnan","Ali","Hussein"],
-"Uzbekistan":["Shomurodov","Hamrobekov","Saidov"],
-"Panama":["Torres","Rodriguez","Diaz"],
-"Paraguay":["Almiron","Sanabria","Romero"],
-"Algeria":["Mahrez","Slimani","Bounedjah"],
-"Tunisia":["Msakni","Jaziri","Sliti"],
-"Ghana":["Partey","Ayew","Williams"],
-"South Africa":["Zungu","Lorch","Makgopa"],
-"Scotland":["McTominay","Robertson","Dykes"],
-"Bosnia and Herzegovina":["Dzeko","Pjanic","Krunic"],
-"Cabo Verde":["Garcia","Semedo","Pina"],
-"Congo DR":["Bakambu","Mbemba","Bolasie"],
-"Curaçao":["Gutiérrez","Bacuna","Janga"],
-"Czechia":["Schick","Soucek","Coufal"],
-"Haiti":["Nazon","Pierre","Pascual"]
+"Uzbekistan":["Shomurodov","Hamrobekov","Saidov"]
 };
 
-/* ===== UI ===== */
+/* ================= UI ================= */
 
 const teamA=document.getElementById("teamA");
 const teamB=document.getElementById("teamB");
@@ -232,41 +225,44 @@ teams.forEach(t=>{
 });
 
 function randomPlayer(team){
-  return players[team][Math.floor(Math.random()*3)];
+  return players[team]?.[Math.floor(Math.random()*3)] || "Star Player";
 }
 
-let scoreA=0, scoreB=0;
+/* ================= MATCH ENGINE (REALISTIC) ================= */
 
 function simulate(A,B){
 
-  scoreA=0; scoreB=0;
+  let strengthA = getStrength(A);
+  let strengthB = getStrength(B);
 
-  let shotsA=0, shotsB=0;
-  let onA=0, onB=0;
+  let scoreA=0, scoreB=0;
 
   for(let i=0;i<20;i++){
 
-    let e=Math.random();
+    let probA = strengthA / (strengthA + strengthB);
+    let probB = 1 - probA;
 
-    if(e<0.5){
-      shotsA++;
-      if(Math.random()<0.3){ scoreA++; onA++; }
-    } else {
-      shotsB++;
-      if(Math.random()<0.3){ scoreB++; onB++; }
+    let event=Math.random();
+
+    if(event < probA * 0.25){
+      if(Math.random() < 0.28) scoreA++;
+    }
+
+    else if(event < probA + probB * 0.25){
+      if(Math.random() < 0.28) scoreB++;
     }
   }
 
-  const possA = Math.floor(40 + Math.random()*20);
-  const possB = 100 - possA;
+  let possA = Math.floor((strengthA/(strengthA+strengthB))*100);
+  let possB = 100 - possA;
 
-  const passA = Math.floor(75 + Math.random()*20);
-  const passB = Math.floor(75 + Math.random()*20);
-
-  return {scoreA,scoreB,shotsA,shotsB,onA,onB,possA,possB,passA,passB};
+  return {
+    scoreA, scoreB,
+    possA, possB
+  };
 }
 
-/* ===== FLOW ===== */
+/* ================= FLOW ================= */
 
 function startMatch(){
 
@@ -277,9 +273,9 @@ function startMatch(){
 
   const steps=[
     "Loading squads...",
-    "AI Tactical Engine...",
-    "World Cup Simulation...",
-    "Finalizing match...",
+    "Analyzing team strength...",
+    "Running FIFA simulation engine...",
+    "Balancing match probabilities...",
     "Kickoff..."
   ];
 
@@ -296,23 +292,21 @@ function startMatch(){
 
         document.getElementById("overlay").style.display="none";
 
-        const r = simulate(A,B);
+        let r = simulate(A,B);
 
         document.getElementById("finalScore").innerText =
           `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
 
         document.getElementById("statsBox").innerHTML = `
           <div class="row"><b>Possession</b><span>${r.possA}% - ${r.possB}%</span></div>
-          <div class="row"><b>Shots</b><span>${r.shotsA} - ${r.shotsB}</span></div>
-          <div class="row"><b>Shots on Target</b><span>${r.onA} - ${r.onB}</span></div>
-          <div class="row"><b>Pass Accuracy</b><span>${r.passA}% - ${r.passB}%</span></div>
         `;
 
-        let goals="⚽ Goals:\n";
-        for(let i=0;i<r.scoreA;i++) goals+=randomPlayer(A)+" ("+A+")\n";
-        for(let i=0;i<r.scoreB;i++) goals+=randomPlayer(B)+" ("+B+")\n";
+        let goals="";
+        for(let i=0;i<r.scoreA;i++) goals += randomPlayer(A)+" ("+A+")<br>";
+        for(let i=0;i<r.scoreB;i++) goals += randomPlayer(B)+" ("+B+")<br>";
 
-        document.getElementById("goalBox").innerText = goals;
+        document.getElementById("goalBox").innerHTML =
+          "<b>⚽ Goals</b><br>"+goals;
 
         showScreen("resultScreen");
 
@@ -321,6 +315,8 @@ function startMatch(){
 
   },500);
 }
+
+/* ================= UI ================= */
 
 function goBack(){
   showScreen("selectScreen");
