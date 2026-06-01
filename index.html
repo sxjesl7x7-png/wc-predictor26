@@ -7,14 +7,17 @@
 
 <style>
 
+/* ================= GLOBAL THEME ================= */
+
 body{
   margin:0;
-  font-family:Arial,sans-serif;
-  background:#050b14;
-  color:white;
+  font-family:Arial, sans-serif;
+  background:#000;
+  color:#fff;
+  overflow-x:hidden;
 }
 
-/* ================= SXJ SPLASH SCREEN ================= */
+/* ================= SXJ SPLASH ================= */
 
 #splashScreen{
   position:fixed;
@@ -23,98 +26,112 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  overflow:hidden;
   z-index:99999;
+  overflow:hidden;
 }
 
 .sxj-logo{
-  color:white;
-  font-size:72px;
+  font-size:70px;
   font-weight:900;
   letter-spacing:12px;
+  color:#fff;
   opacity:0;
-  animation:logoIntro 2.5s ease forwards;
+  animation:logoAnim 2.5s ease forwards;
 }
 
 .wind{
   position:absolute;
   width:300px;
   height:3px;
-  background:white;
+  background:#fff;
   filter:blur(4px);
-  left:-350px;
+  left:-400px;
   top:50%;
   animation:windMove 2.5s ease forwards;
 }
 
 @keyframes windMove{
-  0%{
-    left:-350px;
-    opacity:0;
-  }
-
-  20%{
-    opacity:1;
-  }
-
-  100%{
-    left:120%;
-    opacity:0;
-  }
+  0%{left:-400px;opacity:0;}
+  20%{opacity:1;}
+  100%{left:120%;opacity:0;}
 }
 
-@keyframes logoIntro{
-  0%{
-    opacity:0;
-    transform:translateX(-100px);
-  }
-
-  35%{
-    opacity:1;
-    transform:translateX(0);
-  }
-
-  70%{
-    opacity:1;
-    text-shadow:
-      0 0 15px white,
-      0 0 30px white;
-  }
-
-  100%{
-    opacity:0;
-    transform:scale(1.1);
-  }
+@keyframes logoAnim{
+  0%{opacity:0;transform:translateX(-80px);}
+  40%{opacity:1;transform:translateX(0);}
+  70%{text-shadow:0 0 20px #fff;}
+  100%{opacity:0;transform:scale(1.1);}
 }
 
-/* ================= MAIN SCREENS ================= */
+/* ================= SCREEN SYSTEM ================= */
 
 .screen{
   display:none;
-  padding:15px;
   min-height:100vh;
+  padding:16px;
   box-sizing:border-box;
+
+  opacity:0;
+  transform:scale(1.05);
+  filter:blur(20px);
+  transition:all 0.8s ease;
 }
 
-.active{
+.screen.active{
   display:block;
+  opacity:1;
+  transform:scale(1);
+  filter:blur(0);
 }
 
 /* ================= INPUTS ================= */
 
-select,
-button{
+select,button{
   width:100%;
   padding:14px;
   margin-top:12px;
-  background:#111;
-  border:1px solid #00ffcc;
-  color:white;
   border-radius:10px;
+  background:#000;
+  color:#fff;
+  border:1px solid #ffffff40;
   font-size:16px;
+  transition:0.25s ease;
 }
 
-/* ================= WORLD CUP OVERLAY ================= */
+/* ================= BUTTON ANIMATION ================= */
+
+button{
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+button:hover{
+  box-shadow:0 0 15px #fff;
+  transform:scale(1.03);
+}
+
+button:active{
+  transform:scale(0.95);
+}
+
+/* shine effect */
+button::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-120%;
+  width:120%;
+  height:100%;
+  background:linear-gradient(120deg,transparent,#ffffff30,transparent);
+}
+
+button:hover::before{
+  left:120%;
+  transition:0.6s;
+}
+
+/* ================= OVERLAY ================= */
 
 .overlay{
   position:fixed;
@@ -124,69 +141,40 @@ button{
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  text-align:center;
 }
 
 .wc{
   font-size:28px;
-  color:#00ffcc;
+  color:#fff;
   animation:pulse 1s infinite;
 }
 
 @keyframes pulse{
-  0%{
-    transform:scale(1);
-    opacity:.6;
-  }
-
-  50%{
-    transform:scale(1.15);
-    opacity:1;
-  }
-
-  100%{
-    transform:scale(1);
-    opacity:.6;
-  }
+  0%{transform:scale(1);opacity:0.6;}
+  50%{transform:scale(1.1);opacity:1;}
+  100%{transform:scale(1);opacity:0.6;}
 }
 
-/* ================= RESULT SCREEN ================= */
+/* ================= RESULT ================= */
 
 .score{
   font-size:34px;
   text-align:center;
-  color:#00ffcc;
   margin-top:10px;
+  text-shadow:0 0 10px #fff;
 }
 
-.stats,
-.goalBox{
+.stats,.goalBox{
   margin-top:12px;
-  background:#0b1220;
   padding:12px;
-  border-radius:12px;
-}
-
-.row{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  font-size:14px;
-  color:#ddd;
+  border:1px solid #ffffff20;
+  border-radius:10px;
 }
 
 /* ================= MOBILE ================= */
 
-@media (max-width:600px){
-
-  .row{
-    flex-direction:column;
-    gap:3px;
-  }
-
-  .sxj-logo{
-    font-size:54px;
-  }
+@media(max-width:600px){
+  .sxj-logo{font-size:50px;}
 }
 
 </style>
@@ -194,116 +182,62 @@ button{
 
 <body>
 
-<!-- SXJ INTRO -->
-
+<!-- ================= SXJ INTRO ================= -->
 <div id="splashScreen">
   <div class="wind"></div>
   <div class="sxj-logo">SXJ</div>
 </div>
 
-<!-- TEAM SELECT SCREEN -->
-
+<!-- ================= HOME SCREEN ================= -->
 <div id="selectScreen" class="screen">
 
   <h2>🏆 World Cup 2026 Simulator</h2>
 
   <select id="teamA"></select>
-
   <select id="teamB"></select>
 
-  <button onclick="startMatch()">
-    START MATCH
-  </button>
+  <button onclick="startMatch()">START MATCH</button>
 
 </div>
 
-<!-- WORLD CUP ANIMATION -->
-
+<!-- ================= LOADING ================= -->
 <div id="overlay" class="overlay">
 
-  <div class="wc">
-    🏆 FIFA WORLD CUP 2026
-  </div>
-
-  <p id="loadingText">
-    Loading Engine...
-  </p>
+  <div class="wc">🏆 FIFA WORLD CUP 2026</div>
+  <p id="loadingText">Loading...</p>
 
 </div>
 
-<!-- RESULT SCREEN -->
-
+<!-- ================= RESULT ================= -->
 <div id="resultScreen" class="screen">
 
   <div class="score" id="finalScore"></div>
-
   <div class="stats" id="statsBox"></div>
-
   <div class="goalBox" id="goalBox"></div>
 
-  <button onclick="goBack()">
-    Back
-  </button>
+  <button onclick="goBack()">Back</button>
 
 </div>
-
 <script>
 
-/* ================= TEAMS ================= */
-  let teams = [
-"Algeria",
-"Argentina",
-"Australia",
-"Austria",
-"Belgium",
-"Bosnia and Herzegovina",
-"Brazil",
-"Cabo Verde",
-"Canada",
-"Colombia",
-"Congo DR",
-"Côte d'Ivoire",
-"Croatia",
-"Curaçao",
-"Czechia",
-"Ecuador",
-"Egypt",
-"England",
-"France",
-"Germany",
-"Ghana",
-"Haiti",
-"IR Iran",
-"Iraq",
-"Japan",
-"Jordan",
-"Korea Republic",
-"Mexico",
-"Morocco",
-"Netherlands",
-"New Zealand",
-"Norway",
-"Panama",
-"Paraguay",
-"Portugal",
-"Qatar",
-"Saudi Arabia",
-"Scotland",
-"Senegal",
-"South Africa",
-"Spain",
-"Sweden",
-"Switzerland",
-"Tunisia",
-"Türkiye",
-"United States",
-"Uruguay",
-"Uzbekistan"
+/* ================= 48 TEAMS ================= */
+
+let teams = [
+"Algeria","Argentina","Australia","Austria","Belgium",
+"Bosnia and Herzegovina","Brazil","Cabo Verde","Canada","Colombia",
+"Congo DR","Côte d'Ivoire","Croatia","Curaçao","Czechia",
+"Ecuador","Egypt","England","France","Germany",
+"Ghana","Haiti","IR Iran","Iraq","Japan",
+"Jordan","Korea Republic","Mexico","Morocco","Netherlands",
+"New Zealand","Norway","Panama","Paraguay","Portugal",
+"Qatar","Saudi Arabia","Scotland","Senegal","South Africa",
+"Spain","Sweden","Switzerland","Tunisia","Türkiye",
+"United States","Uruguay","Uzbekistan"
 ];
 
 teams.sort((a,b)=>a.localeCompare(b));
 
-/* ================= TEAM STRENGTHS ================= */
+/* ================= TEAM STRENGTH ================= */
 
 const teamStats = {
 
@@ -360,67 +294,63 @@ const teamStats = {
 };
 
 function getStrength(team){
-
   if(!teamStats[team]) return 75;
-
-  let [attack,midfield,defense] = teamStats[team];
-
-  return (attack + midfield + defense) / 3;
+  let [a,m,d] = teamStats[team];
+  return (a+m+d)/3;
 }
 
-/* ================= PLAYERS ================= */
+/* ================= PLAYERS (ONLY 3 PER TEAM RULE) ================= */
 
 const players = {
 
-"Argentina":["Messi","Julián Álvarez","Lautaro Martínez"],
-"Brazil":["Vinícius Júnior","Rodrygo","Richarlison"],
-"France":["Mbappé","Griezmann","Thuram"],
-"England":["Harry Kane","Saka","Foden"],
-"Spain":["Morata","Pedri","Lamine Yamal"],
+"Argentina":["Messi","Alvarez","Lautaro Martinez"],
+"Brazil":["Vinicius Jr","Rodrygo","Richarlison"],
+"France":["Mbappe","Griezmann","Thuram"],
+"England":["Kane","Saka","Foden"],
+"Spain":["Morata","Pedri","Yamal"],
 "Germany":["Musiala","Havertz","Kimmich"],
-"Italy":["Chiesa","Barella","Raspadori"],
-"Portugal":["Cristiano Ronaldo","Bruno Fernandes","Nuno Mendes"],
-"Netherlands":["Depay","Gakpo","Xavi Simons"],
+"Portugal":["Ronaldo","Bruno Fernandes","Nuno Mendes"],
+"Netherlands":["Depay","Gakpo","Simons"],
 "Belgium":["De Bruyne","Lukaku","Doku"],
-"Croatia":["Modrić","Kramarić","Perišić"],
+"Croatia":["Modric","Kramaric","Perisic"],
 "Morocco":["Hakimi","Ziyech","En-Nesyri"],
 "Japan":["Kubo","Mitoma","Minamino"],
-"Mexico":["Lozano","Jiménez","Vega"],
-"Canada":["Jonathan David","Larin","Buchanan"],
+"Mexico":["Jimenez","Lozano","Vega"],
+"Canada":["David","Larin","Buchanan"],
 "United States":["Pulisic","Balogun","Reyna"],
 "Egypt":["Salah","Marmoush","Trezeguet"],
-"Senegal":["Mané","Jackson","Sarr"],
-"Uruguay":["Darwin Núñez","Valverde","Pellistri"],
-"Colombia":["Luis Díaz","Jhon Durán","James Rodríguez"],
+"Senegal":["Mane","Jackson","Sarr"],
+"Uruguay":["Nunez","Valverde","Pellistri"],
+"Colombia":["Luis Diaz","Jhon Duran","James Rodriguez"],
 "Switzerland":["Xhaka","Embolo","Shaqiri"],
-"Norway":["Haaland","Ødegaard","Sørloth"],
-"Türkiye":["Çalhanoğlu","Yıldız","Aktürkoğlu"],
+"Norway":["Haaland","Sorloth","Odegaard"],
+"Türkiye":["Calhanoglu","Yildiz","Akturkoglu"],
 "Qatar":["Afif","Almoez Ali","Hassan"],
 "Saudi Arabia":["Al-Dawsari","Al-Shehri","Al-Buraikan"],
 "Australia":["Goodwin","Boyle","Maclaren"],
-"New Zealand":["Chris Wood","Barbarouses","Singh"],
-"Korea Republic":["Son Heung-min","Hwang Hee-chan","Lee Kang-in"],
+"New Zealand":["Wood","Barbarouses","Singh"],
+"Korea Republic":["Son","Hwang Hee-chan","Lee Kang-in"],
 "IR Iran":["Taremi","Azmoun","Ghoddos"],
-"Iraq":["Ali Jasim","Aymen Hussein","Adnan"],
+"Iraq":["Ali","Hussein","Adnan"],
 "Uzbekistan":["Shomurodov","Hamrobekov","Saidov"],
 
 "Algeria":["Mahrez","Slimani","Bounedjah"],
-"Austria":["Sabitzer","Baumgartner","Arnautović"],
-"Bosnia and Herzegovina":["Džeko","Pjanić","Krunić"],
+"Austria":["Sabitzer","Arnautovic","Baumgartner"],
+"Bosnia and Herzegovina":["Dzeko","Pjanic","Krunic"],
 "Cabo Verde":["Semedo","Pina","Garcia"],
 "Congo DR":["Bakambu","Mbemba","Bolasie"],
-"Côte d'Ivoire":["Haller","Adingra","Kessié"],
+"Côte d'Ivoire":["Haller","Kessie","Adingra"],
 "Curaçao":["Bacuna","Janga","Maria"],
-"Czechia":["Schick","Souček","Coufal"],
+"Czechia":["Schick","Soucek","Coufal"],
 "Ecuador":["Valencia","Caicedo","Plata"],
 "Ghana":["Kudus","Ayew","Partey"],
 "Haiti":["Nazon","Pierrot","Pascual"],
 "Jordan":["Al-Naimat","Al-Taamari","Abu Taha"],
-"Panama":["Díaz","Torres","Rodríguez"],
-"Paraguay":["Almirón","Sanabria","Romero"],
+"Panama":["Diaz","Torres","Rodriguez"],
+"Paraguay":["Almiron","Sanabria","Romero"],
 "Scotland":["McTominay","Robertson","Dykes"],
 "South Africa":["Lorch","Makgopa","Mokoena"],
-"Sweden":["Isak","Kulusevski","Gyökeres"],
+"Sweden":["Isak","Kulusevski","Gyokeres"],
 "Tunisia":["Msakni","Jaziri","Sliti"]
 };
 
@@ -429,32 +359,21 @@ const players = {
 const teamA = document.getElementById("teamA");
 const teamB = document.getElementById("teamB");
 
-teams.forEach(team=>{
-
-  const optionA = document.createElement("option");
-  const optionB = document.createElement("option");
-
-  optionA.text = team;
-  optionB.text = team;
-
-  optionA.value = team;
-  optionB.value = team;
-
-  teamA.add(optionA);
-  teamB.add(optionB);
-
+teams.forEach(t=>{
+  let a=document.createElement("option");
+  let b=document.createElement("option");
+  a.text=b.text=t;
+  a.value=b.value=t;
+  teamA.add(a);
+  teamB.add(b);
 });
 
 function randomPlayer(team){
-
-  return players[team][
-    Math.floor(Math.random()*players[team].length)
-  ];
-
+  return players[team][Math.floor(Math.random()*3)] || "Player";
 }
+  /* ================= MATCH ENGINE ================= */
 
-/* ================= MATCH ENGINE ================= */
-  function simulate(A,B){
+function simulate(A,B){
 
   let strengthA = getStrength(A);
   let strengthB = getStrength(B);
@@ -462,85 +381,44 @@ function randomPlayer(team){
   let scoreA = 0;
   let scoreB = 0;
 
-  /* realistic strength weighting */
-
   let advantage = strengthA - strengthB;
 
-  let expectedA = Math.max(0.6, (strengthA / 25));
-  let expectedB = Math.max(0.4, (strengthB / 28));
+  let baseA = strengthA / 25;
+  let baseB = strengthB / 25;
 
-  scoreA = Math.round(
-    (Math.random() * expectedA) +
-    (advantage > 0 ? advantage / 25 : 0)
-  );
+  scoreA = Math.round((Math.random() * baseA) + (advantage > 0 ? advantage/22 : 0));
+  scoreB = Math.round((Math.random() * baseB) + (advantage < 0 ? Math.abs(advantage)/22 : 0));
 
-  scoreB = Math.round(
-    (Math.random() * expectedB) +
-    (advantage < 0 ? Math.abs(advantage) / 25 : 0)
-  );
+  /* upset control (strong teams win more often) */
 
-  /* upset protection */
-
-  if(strengthA - strengthB > 12){
-
-    if(scoreB > scoreA){
-      scoreB = Math.max(0, scoreA - 1);
-    }
-
+  if(strengthA - strengthB > 15){
+    if(scoreB > scoreA) scoreB = Math.max(0, scoreA - 1);
   }
 
-  if(strengthB - strengthA > 12){
-
-    if(scoreA > scoreB){
-      scoreA = Math.max(0, scoreB - 1);
-    }
-
+  if(strengthB - strengthA > 15){
+    if(scoreA > scoreB) scoreA = Math.max(0, scoreB - 1);
   }
 
-  /* realistic possession */
+  /* stats */
 
-  let possA = Math.round(
-    (strengthA / (strengthA + strengthB)) * 100
-  );
-
+  let possA = Math.round((strengthA/(strengthA+strengthB))*100);
   let possB = 100 - possA;
 
-  /* realistic stats */
+  let shotsA = Math.floor(scoreA*3 + Math.random()*6 + 4);
+  let shotsB = Math.floor(scoreB*3 + Math.random()*6 + 4);
 
-  let shotsA =
-    Math.floor(scoreA * 3 + Math.random() * 8 + 4);
+  let onTargetA = Math.max(scoreA, Math.floor(shotsA*0.5));
+  let onTargetB = Math.max(scoreB, Math.floor(shotsB*0.5));
 
-  let shotsB =
-    Math.floor(scoreB * 3 + Math.random() * 8 + 4);
-
-  let onTargetA =
-    Math.max(scoreA, Math.floor(shotsA * 0.45));
-
-  let onTargetB =
-    Math.max(scoreB, Math.floor(shotsB * 0.45));
-
-  let passesA =
-    Math.floor(250 + possA * 5 + Math.random()*80);
-
-  let passesB =
-    Math.floor(250 + possB * 5 + Math.random()*80);
+  let passesA = Math.floor(250 + possA*4 + Math.random()*60);
+  let passesB = Math.floor(250 + possB*4 + Math.random()*60);
 
   return {
-
-    scoreA,
-    scoreB,
-
-    possA,
-    possB,
-
-    shotsA,
-    shotsB,
-
-    onTargetA,
-    onTargetB,
-
-    passesA,
-    passesB
+    scoreA, scoreB,
+    possA, possB,
+    shotsA, shotsB,
+    onTargetA, onTargetB,
+    passesA, passesB
   };
 }
 
@@ -554,24 +432,19 @@ function startMatch(){
   document.getElementById("overlay").style.display = "flex";
 
   const steps = [
-
     "Loading squads...",
     "Analyzing attack...",
     "Analyzing midfield...",
     "Analyzing defense...",
-    "Calculating match probabilities...",
-    "Running World Cup 2026 simulation...",
+    "Running World Cup simulation...",
     "Finalizing result..."
-
   ];
 
   let i = 0;
 
-  const interval = setInterval(()=>{
+  let interval = setInterval(()=>{
 
-    document.getElementById("loadingText").innerText =
-      steps[i];
-
+    document.getElementById("loadingText").innerText = steps[i];
     i++;
 
     if(i >= steps.length){
@@ -580,110 +453,79 @@ function startMatch(){
 
       setTimeout(()=>{
 
-        document.getElementById("overlay").style.display =
-          "none";
+        document.getElementById("overlay").style.display = "none";
 
-        let result = simulate(A,B);
+        let r = simulate(A,B);
 
-        document.getElementById("finalScore").innerHTML =
-          `${A} ${result.scoreA} - ${result.scoreB} ${B}`;
+        document.getElementById("finalScore").innerText =
+          `${A} ${r.scoreA} - ${r.scoreB} ${B}`;
 
-        document.getElementById("statsBox").innerHTML =
-
-        `
-        <div class="row">
-          <b>Possession</b>
-          <span>${result.possA}% - ${result.possB}%</span>
-        </div>
-
-        <div class="row">
-          <b>Shots</b>
-          <span>${result.shotsA} - ${result.shotsB}</span>
-        </div>
-
-        <div class="row">
-          <b>Shots On Target</b>
-          <span>${result.onTargetA} - ${result.onTargetB}</span>
-        </div>
-
-        <div class="row">
-          <b>Passes Completed</b>
-          <span>${result.passesA} - ${result.passesB}</span>
-        </div>
+        document.getElementById("statsBox").innerHTML = `
+          <div class="row"><b>Possession</b><span>${r.possA}% - ${r.possB}%</span></div>
+          <div class="row"><b>Shots</b><span>${r.shotsA} - ${r.shotsB}</span></div>
+          <div class="row"><b>On Target</b><span>${r.onTargetA} - ${r.onTargetB}</span></div>
+          <div class="row"><b>Passes</b><span>${r.passesA} - ${r.passesB}</span></div>
         `;
 
         let goals = [];
 
-        for(let i=0;i<result.scoreA;i++){
-
-          goals.push(
-            `⚽ ${randomPlayer(A)} (${A})`
-          );
-
+        for(let i=0;i<r.scoreA;i++){
+          goals.push(`⚽ ${randomPlayer(A)} (${A})`);
         }
 
-        for(let i=0;i<result.scoreB;i++){
-
-          goals.push(
-            `⚽ ${randomPlayer(B)} (${B})`
-          );
-
+        for(let i=0;i<r.scoreB;i++){
+          goals.push(`⚽ ${randomPlayer(B)} (${B})`);
         }
 
         goals.sort(()=>Math.random()-0.5);
 
         document.getElementById("goalBox").innerHTML =
-          `
-          <b>Goalscorers</b><br><br>
-          ${goals.join("<br>")}
-          `;
+          "<b>Goals</b><br><br>" + goals.join("<br>");
 
         showScreen("resultScreen");
 
       },800);
-
     }
 
-  },600);
-
+  },500);
 }
 
-/* ================= UI ================= */
+/* ================= SCREEN SWITCH ================= */
 
 function goBack(){
-
   showScreen("selectScreen");
-
 }
 
 function showScreen(id){
 
-  document
-  .querySelectorAll(".screen")
-  .forEach(screen=>{
-
-    screen.classList.remove("active");
-
+  document.querySelectorAll(".screen").forEach(s=>{
+    s.classList.remove("active");
   });
 
-  document
-  .getElementById(id)
-  .classList.add("active");
+  const el = document.getElementById(id);
+  el.classList.add("active");
 
+  /* trigger blur-to-clear animation */
+  setTimeout(()=>{
+    el.style.opacity = "1";
+  },50);
 }
 
-/* ================= SXJ INTRO ================= */
+/* ================= SXJ STARTUP ================= */
 
 window.addEventListener("load",()=>{
 
-  const splash =
-    document.getElementById("splashScreen");
+  const splash = document.getElementById("splashScreen");
 
   setTimeout(()=>{
 
-    splash.style.display = "none";
+    splash.style.opacity = "0";
+    splash.style.transition = "0.6s ease";
 
-    showScreen("selectScreen");
+    setTimeout(()=>{
+      splash.style.display = "none";
+      showScreen("selectScreen");
+    },600);
 
   },2500);
 
