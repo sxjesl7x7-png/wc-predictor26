@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Football Simulator V3</title>
+<title>World Cup 2026 Simulator</title>
 
 <style>
 body {
@@ -28,14 +28,28 @@ select, button {
 .overlay {
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.95);
+  background:rgba(0,0,0,0.92);
   display:none;
   justify-content:center;
   align-items:center;
   flex-direction:column;
+  text-align:center;
 }
 
 .glow { color:#00ffcc; font-size:18px; }
+
+.wc-logo {
+  font-size:40px;
+  color:#00ffcc;
+  margin-bottom:10px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform:scale(1); opacity:0.7; }
+  50% { transform:scale(1.2); opacity:1; }
+  100% { transform:scale(1); opacity:0.7; }
+}
 
 .score {
   font-size:42px;
@@ -52,15 +66,13 @@ select, button {
   border-radius:10px;
   font-size:14px;
 }
-
-.goal { color:#aaa; margin-top:5px; }
 </style>
 </head>
 
 <body>
 
 <div id="selectScreen" class="screen active">
-  <h2>⚽ World Cup Simulator (48 Teams)</h2>
+  <h2>⚽ World Cup 2026 Simulator</h2>
 
   <select id="teamA"></select>
   <select id="teamB"></select>
@@ -69,7 +81,8 @@ select, button {
 </div>
 
 <div id="overlay" class="overlay">
-  <div class="glow" id="loadingText">Loading Match Engine...</div>
+  <div class="wc-logo">🏆 FIFA WORLD CUP 2026</div>
+  <div class="glow" id="loadingText">Initializing AI Engine...</div>
 </div>
 
 <div id="matchScreen" class="screen">
@@ -83,80 +96,89 @@ select, button {
 <script>
 
 /* =========================
-   48 WORLD TEAMS (SIMULATED)
+   WC 2026 TEAMS (SORTED)
 ========================= */
 
-const teams = [
-"Argentina","Brazil","France","England","Spain","Germany",
-"Italy","Portugal","Netherlands","Belgium","Croatia","Uruguay",
-"USA","Mexico","Canada","Colombia","Chile","Peru",
-"Ecuador","Paraguay","Bolivia","Morocco","Nigeria","Senegal",
-"Japan","South Korea","Australia","Iran","Saudi Arabia","Qatar",
-"Egypt","Algeria","Tunisia","Ghana","Ivory Coast","Cameroon",
-"Denmark","Sweden","Switzerland","Austria","Poland","Czechia",
-"Ukraine","Serbia","Norway","Turkey","Hungary","South Africa"
+let teams = [
+"Algeria","Argentina","Australia","Austria","Belgium",
+"Bosnia and Herzegovina","Brazil","Cabo Verde","Canada","Colombia",
+"Congo DR","Côte d'Ivoire","Croatia","Curaçao","Czechia",
+"Ecuador","Egypt","England","France","Germany",
+"Ghana","Haiti","IR Iran","Iraq","Japan",
+"Jordan","Korea Republic","Mexico","Morocco","Netherlands",
+"New Zealand","Norway","Panama","Paraguay","Portugal",
+"Qatar","Saudi Arabia","Scotland","Senegal","South Africa",
+"Spain","Sweden","Switzerland","Tunisia","Türkiye",
+"United States","Uruguay","Uzbekistan"
 ];
 
+// SORT A → Z (your requirement)
+teams.sort((a,b)=>a.localeCompare(b));
+
 /* =========================
-   3 PLAYERS PER TEAM ONLY
-   (STRICT SCORING RULE)
+   3 PLAYERS PER COUNTRY
 ========================= */
 
 const players = {
-"Argentina": ["Messi","Alvarez","Lautaro Martinez"],
-"Brazil": ["Vinicius Jr","Rodrygo","Richarlison"],
-"France": ["Mbappe","Griezmann","Thuram"],
-"England": ["Kane","Saka","Foden"],
-"Spain": ["Morata","Pedri","Yamal"],
-"Germany": ["Kimmich","Musiala","Havertz"],
-"Italy": ["Chiesa","Raspadori","Barella"],
-"Portugal": ["Ronaldo","Bruno Fernandes","Nuno Mendes"],
-"Netherlands": ["Depay","Gakpo","Simons"],
-"Belgium": ["De Bruyne","Lukaku","Doku"],
-"Croatia": ["Modric","Kramaric","Perisic"],
-"Uruguay": ["Nunez","Valverde","Pellistri"],
-"USA": ["Pulisic","Balogun","Reyna"],
-"Mexico": ["Jimenez","Lozano","Vega"],
-"Canada": ["David","Larin","Buchanan"],
-"Colombia": ["Luis Diaz","Jhon Duran","James Rodriguez"],
-"Chile": ["Vargas","Brereton Diaz","Valdes"],
-"Peru": ["Guerrero","Cueva","Lapadula"],
-"Ecuador": ["Valencia","Caicedo","Estrada"],
-"Paraguay": ["Almiron","Sanabria","Romero"],
-"Bolivia": ["Moreno","Fernandez","Vaca"],
-"Morocco": ["Ziyech","En-Nesyri","Hakimi"],
-"Nigeria": ["Osimhen","Lookman","Iwobi"],
-"Senegal": ["Mané","Jackson","Sarr"],
-"Japan": ["Kubo","Mitoma","Minamino"],
-"South Korea": ["Son","Hwang Hee-chan","Lee Kang-in"],
-"Australia": ["Goodwin","Boyle","Maclaren"],
-"Iran": ["Taremi","Azmoun","Ghoddos"],
-"Saudi Arabia": ["Al-Dawsari","Al-Shehri","Al-Buraikan"],
-"Qatar": ["Almoez Ali","Afif","Hassan"],
-"Egypt": ["Salah","Marmoush","Trezeguet"],
-"Algeria": ["Mahrez","Slimani","Bounedjah"],
-"Tunisia": ["Msakni","Jaziri","Sliti"],
-"Ghana": ["Partey","Ayew","Williams"],
-"Ivory Coast": ["Haller","Kessie","Pepe"],
-"Cameroon": ["Aboubakar","Choupo-Moting","Ngamaleu"],
-"Denmark": ["Eriksen","Hojlund","Wind"],
-"Sweden": ["Isak","Kulusevski","Forsberg"],
-"Switzerland": ["Shaqiri","Embolo","Xhaka"],
-"Austria": ["Arnautovic","Sabitzer","Baumgartner"],
-"Poland": ["Lewandowski","Zielinski","Szczesny"],
-"Czechia": ["Schick","Soucek","Coufal"],
-"Ukraine": ["Yarmolenko","Dovbyk","Mudryk"],
-"Serbia": ["Vlahovic","Mitrovic","Tadic"],
-"Norway": ["Haaland","Sorloth","Ødegaard"],
-"Turkey": ["Calhanoglu","Yildiz","Akturkoglu"],
-"Hungary": ["Szalai","Soboszlai","Orban"],
-"South Africa": ["Zungu","Lorch","Makgopa"]
+"Argentina":["Messi","Alvarez","Lautaro Martinez"],
+"Brazil":["Vinicius Jr","Rodrygo","Richarlison"],
+"France":["Mbappe","Griezmann","Thuram"],
+"England":["Kane","Saka","Foden"],
+"Spain":["Morata","Pedri","Yamal"],
+"Germany":["Musiala","Kimmich","Havertz"],
+"Italy":["Chiesa","Barella","Raspadori"],
+"Portugal":["Ronaldo","Bruno Fernandes","Nuno Mendes"],
+"Netherlands":["Depay","Gakpo","Simons"],
+"Belgium":["De Bruyne","Lukaku","Doku"],
+"Croatia":["Modric","Kramaric","Perisic"],
+"Morocco":["Ziyech","En-Nesyri","Hakimi"],
+"Japan":["Kubo","Mitoma","Minamino"],
+"Mexico":["Jimenez","Lozano","Vega"],
+"Canada":["David","Larin","Buchanan"],
+"USA":["Pulisic","Balogun","Reyna"],
+"Egypt":["Salah","Marmoush","Trezeguet"],
+"Senegal":["Mané","Jackson","Sarr"],
+"Uruguay":["Nunez","Valverde","Pellistri"],
+"Colombia":["Luis Diaz","Jhon Duran","James Rodriguez"],
+"Switzerland":["Xhaka","Embolo","Shaqiri"],
+"Norway":["Haaland","Sorloth","Ødegaard"],
+"Türkiye":["Calhanoglu","Yildiz","Akturkoglu"],
+"Qatar":["Almoez Ali","Afif","Hassan"],
+"Saudi Arabia":["Al-Dawsari","Al-Shehri","Al-Buraikan"],
+"Australia":["Goodwin","Boyle","Maclaren"],
+"New Zealand":["Wood","Barbarouses","Singh"],
+"South Korea":["Son","Hwang Hee-chan","Lee Kang-in"],
+"IR Iran":["Taremi","Azmoun","Ghoddos"],
+"Iraq":["Adnan","Ali","Hussein"],
+"Uzbekistan":["Shomurodov","Hamrobekov","Saidov"],
+"Panama":["Torres","Rodriguez","Diaz"],
+"Paraguay":["Almiron","Sanabria","Romero"],
+"Chile":["Vargas","Brereton Diaz","Valdes"],
+"Peru":["Guerrero","Cueva","Lapadula"],
+"Ecuador":["Valencia","Caicedo","Estrada"],
+"Algeria":["Mahrez","Slimani","Bounedjah"],
+"Tunisia":["Msakni","Jaziri","Sliti"],
+"Ghana":["Partey","Ayew","Williams"],
+"South Africa":["Zungu","Lorch","Makgopa"],
+"Scotland":["McTominay","Robertson","Dykes"],
+"Bosnia and Herzegovina":["Dzeko","Pjanic","Krunic"],
+"Cabo Verde":["Garcia","Semedo","Pina"],
+"Congo DR":["Bakambu","Mbemba","Bolasie"],
+"Curaçao":["Gutiérrez","Bacuna","Janga"],
+"Czechia":["Schick","Soucek","Coufal"],
+"Haiti":["Pascual","Nazon","Pierre"]
 };
+
+// fallback safety
+function randomPlayer(team){
+  const pool = players[team] || ["Star Player 1","Star Player 2","Star Player 3"];
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 
 /* ========================= */
 
-let teamA = document.getElementById("teamA");
-let teamB = document.getElementById("teamB");
+const teamA=document.getElementById("teamA");
+const teamB=document.getElementById("teamB");
 
 teams.forEach(t=>{
   let a=document.createElement("option");
@@ -180,37 +202,39 @@ function startMatch(){
   const A=teamA.value;
   const B=teamB.value;
 
-  scoreA=0;
-  scoreB=0;
+  scoreA=0; scoreB=0;
 
   document.getElementById("overlay").style.display="flex";
 
   const steps=[
-    "Building Tactical AI...",
-    "Loading Player Data...",
-    "Balancing Match Engine...",
-    "Simulating 90 Minutes...",
-    "Kickoff Ready..."
+    "Loading Squad Data...",
+    "Analyzing Formations...",
+    "Connecting to FIFA Simulation Engine...",
+    "Generating Match Physics...",
+    "Kickoff Preparation Complete..."
   ];
 
   let i=0;
 
   const interval=setInterval(()=>{
     document.getElementById("loadingText").innerText=steps[i++];
+
     if(i===steps.length){
       clearInterval(interval);
+
       setTimeout(()=>{
         document.getElementById("overlay").style.display="none";
         showScreen("matchScreen");
         simulate(A,B);
-      },500);
+      },800);
     }
   },600);
 }
 
 function simulate(A,B){
 
-  log(`⚽ ${A} vs ${B} Kickoff!`);
+  log("🏆 FIFA World Cup 2026 Match Started!");
+  log(`⚽ ${A} vs ${B}`);
 
   let minute=0;
 
@@ -226,35 +250,28 @@ function simulate(A,B){
 
     let event=Math.random();
 
-    if(event < 0.25){
-      log(`🟡 ${A} attack at ${minute}'`);
-
-      if(Math.random() < 0.18){
-        const scorer = randomPlayer(A);
+    if(event<0.25){
+      if(Math.random()<0.18){
         scoreA++;
-        log(`⚽ GOAL! ${scorer} (${A}) ${minute}'`);
+        log(`⚽ GOAL! ${randomPlayer(A)} (${A}) ${minute}'`);
+      } else {
+        log(`${A} attack at ${minute}'`);
       }
     }
 
-    else if(event < 0.5){
-      log(`🟡 ${B} attack at ${minute}'`);
-
-      if(Math.random() < 0.18){
-        const scorer = randomPlayer(B);
+    else if(event<0.5){
+      if(Math.random()<0.18){
         scoreB++;
-        log(`⚽ GOAL! ${scorer} (${B}) ${minute}'`);
+        log(`⚽ GOAL! ${randomPlayer(B)} (${B}) ${minute}'`);
+      } else {
+        log(`${B} attack at ${minute}'`);
       }
     }
 
-    document.getElementById("score").innerText =
+    document.getElementById("score").innerText=
       `${A} ${scoreA} - ${scoreB} ${B}`;
 
   },500);
-}
-
-function randomPlayer(team){
-  const pool = players[team];
-  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 function goBack(){
