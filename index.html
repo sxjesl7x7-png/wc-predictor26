@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Football Simulator V2</title>
+<title>Football Simulator V3</title>
 
 <style>
 body {
@@ -43,25 +43,12 @@ select, button {
   color:#00ffcc;
 }
 
-.grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-
-.box {
-  background:#0d1a2b;
-  padding:10px;
-  border-radius:10px;
-}
-
 .commentary {
-  height:200px;
+  margin-top:10px;
+  height:220px;
   overflow:auto;
   background:#0b1220;
   padding:10px;
-  margin-top:10px;
   border-radius:10px;
   font-size:14px;
 }
@@ -73,7 +60,7 @@ select, button {
 <body>
 
 <div id="selectScreen" class="screen active">
-  <h2>⚽ Football Simulator V2</h2>
+  <h2>⚽ World Cup Simulator (48 Teams)</h2>
 
   <select id="teamA"></select>
   <select id="teamB"></select>
@@ -82,62 +69,105 @@ select, button {
 </div>
 
 <div id="overlay" class="overlay">
-  <div class="glow" id="loadingText">Loading AI Engine...</div>
+  <div class="glow" id="loadingText">Loading Match Engine...</div>
 </div>
 
 <div id="matchScreen" class="screen">
 
   <div class="score" id="score">0 - 0</div>
-
-  <div class="grid">
-    <div class="box">
-      <h3>Stats</h3>
-      <div id="stats"></div>
-    </div>
-
-    <div class="box">
-      <h3>Possession</h3>
-      <div id="possession"></div>
-    </div>
-  </div>
-
   <div class="commentary" id="commentary"></div>
 
-  <button onclick="goBack()">Exit</button>
+  <button onclick="goBack()">Back</button>
 </div>
 
 <script>
+
+/* =========================
+   48 WORLD TEAMS (SIMULATED)
+========================= */
+
 const teams = [
 "Argentina","Brazil","France","England","Spain","Germany",
-"Italy","Portugal","Netherlands","Belgium","Croatia","USA"
+"Italy","Portugal","Netherlands","Belgium","Croatia","Uruguay",
+"USA","Mexico","Canada","Colombia","Chile","Peru",
+"Ecuador","Paraguay","Bolivia","Morocco","Nigeria","Senegal",
+"Japan","South Korea","Australia","Iran","Saudi Arabia","Qatar",
+"Egypt","Algeria","Tunisia","Ghana","Ivory Coast","Cameroon",
+"Denmark","Sweden","Switzerland","Austria","Poland","Czechia",
+"Ukraine","Serbia","Norway","Turkey","Hungary","South Africa"
 ];
 
-const players = [
-"Cristiano Ronaldo","Messi","Neymar","Mbappe","Haaland",
-"Benzema","Modric","De Bruyne","Vinicius Jr","Saka"
-];
+/* =========================
+   3 PLAYERS PER TEAM ONLY
+   (STRICT SCORING RULE)
+========================= */
 
-// TEAM STRENGTH SYSTEM
-const strength = {
-"Argentina":88,"Brazil":90,"France":91,"England":87,
-"Spain":86,"Germany":85,"Italy":84,"Portugal":86,
-"Netherlands":83,"Belgium":82,"Croatia":80,"USA":75
+const players = {
+"Argentina": ["Messi","Alvarez","Lautaro Martinez"],
+"Brazil": ["Vinicius Jr","Rodrygo","Richarlison"],
+"France": ["Mbappe","Griezmann","Thuram"],
+"England": ["Kane","Saka","Foden"],
+"Spain": ["Morata","Pedri","Yamal"],
+"Germany": ["Kimmich","Musiala","Havertz"],
+"Italy": ["Chiesa","Raspadori","Barella"],
+"Portugal": ["Ronaldo","Bruno Fernandes","Nuno Mendes"],
+"Netherlands": ["Depay","Gakpo","Simons"],
+"Belgium": ["De Bruyne","Lukaku","Doku"],
+"Croatia": ["Modric","Kramaric","Perisic"],
+"Uruguay": ["Nunez","Valverde","Pellistri"],
+"USA": ["Pulisic","Balogun","Reyna"],
+"Mexico": ["Jimenez","Lozano","Vega"],
+"Canada": ["David","Larin","Buchanan"],
+"Colombia": ["Luis Diaz","Jhon Duran","James Rodriguez"],
+"Chile": ["Vargas","Brereton Diaz","Valdes"],
+"Peru": ["Guerrero","Cueva","Lapadula"],
+"Ecuador": ["Valencia","Caicedo","Estrada"],
+"Paraguay": ["Almiron","Sanabria","Romero"],
+"Bolivia": ["Moreno","Fernandez","Vaca"],
+"Morocco": ["Ziyech","En-Nesyri","Hakimi"],
+"Nigeria": ["Osimhen","Lookman","Iwobi"],
+"Senegal": ["Mané","Jackson","Sarr"],
+"Japan": ["Kubo","Mitoma","Minamino"],
+"South Korea": ["Son","Hwang Hee-chan","Lee Kang-in"],
+"Australia": ["Goodwin","Boyle","Maclaren"],
+"Iran": ["Taremi","Azmoun","Ghoddos"],
+"Saudi Arabia": ["Al-Dawsari","Al-Shehri","Al-Buraikan"],
+"Qatar": ["Almoez Ali","Afif","Hassan"],
+"Egypt": ["Salah","Marmoush","Trezeguet"],
+"Algeria": ["Mahrez","Slimani","Bounedjah"],
+"Tunisia": ["Msakni","Jaziri","Sliti"],
+"Ghana": ["Partey","Ayew","Williams"],
+"Ivory Coast": ["Haller","Kessie","Pepe"],
+"Cameroon": ["Aboubakar","Choupo-Moting","Ngamaleu"],
+"Denmark": ["Eriksen","Hojlund","Wind"],
+"Sweden": ["Isak","Kulusevski","Forsberg"],
+"Switzerland": ["Shaqiri","Embolo","Xhaka"],
+"Austria": ["Arnautovic","Sabitzer","Baumgartner"],
+"Poland": ["Lewandowski","Zielinski","Szczesny"],
+"Czechia": ["Schick","Soucek","Coufal"],
+"Ukraine": ["Yarmolenko","Dovbyk","Mudryk"],
+"Serbia": ["Vlahovic","Mitrovic","Tadic"],
+"Norway": ["Haaland","Sorloth","Ødegaard"],
+"Turkey": ["Calhanoglu","Yildiz","Akturkoglu"],
+"Hungary": ["Szalai","Soboszlai","Orban"],
+"South Africa": ["Zungu","Lorch","Makgopa"]
 };
 
-const teamA = document.getElementById("teamA");
-const teamB = document.getElementById("teamB");
+/* ========================= */
+
+let teamA = document.getElementById("teamA");
+let teamB = document.getElementById("teamB");
 
 teams.forEach(t=>{
   let a=document.createElement("option");
   let b=document.createElement("option");
   a.text=b.text=t;
   a.value=b.value=t;
-  teamA.add(a); teamB.add(b);
+  teamA.add(a);
+  teamB.add(b);
 });
 
 let scoreA=0, scoreB=0;
-let shotsA=0, shotsB=0;
-let possA=50, possB=50;
 
 function log(msg){
   const box=document.getElementById("commentary");
@@ -150,16 +180,16 @@ function startMatch(){
   const A=teamA.value;
   const B=teamB.value;
 
-  scoreA=0; scoreB=0;
-  shotsA=0; shotsB=0;
+  scoreA=0;
+  scoreB=0;
 
   document.getElementById("overlay").style.display="flex";
 
   const steps=[
-    "Building Tactical Models...",
-    "Analyzing Formations...",
-    "Simulating Match Engine...",
-    "Injecting Random Chaos...",
+    "Building Tactical AI...",
+    "Loading Player Data...",
+    "Balancing Match Engine...",
+    "Simulating 90 Minutes...",
     "Kickoff Ready..."
   ];
 
@@ -172,62 +202,59 @@ function startMatch(){
       setTimeout(()=>{
         document.getElementById("overlay").style.display="none";
         showScreen("matchScreen");
-        simulateMatch(A,B);
+        simulate(A,B);
       },500);
     }
   },600);
 }
 
-function simulateMatch(A,B){
+function simulate(A,B){
 
-  log("Kickoff! " + A + " vs " + B);
+  log(`⚽ ${A} vs ${B} Kickoff!`);
 
   let minute=0;
 
   const match=setInterval(()=>{
 
-    minute+=5;
+    minute += Math.floor(Math.random()*10)+1;
 
-    const diff = strength[A]-strength[B];
-
-    possA = 50 + diff/3;
-    possB = 100 - possA;
+    if(minute>90){
+      clearInterval(match);
+      log("🏁 Full Time!");
+      return;
+    }
 
     let event=Math.random();
 
     if(event < 0.25){
-      shotsA++;
-      log(`🟡 ${A} attacks in ${minute}'`);
-      if(Math.random() < (0.15 + diff/200)){
+      log(`🟡 ${A} attack at ${minute}'`);
+
+      if(Math.random() < 0.18){
+        const scorer = randomPlayer(A);
         scoreA++;
-        log(`⚽ GOAL! ${players[Math.floor(Math.random()*players.length)]} (${A}) ${minute}'`);
+        log(`⚽ GOAL! ${scorer} (${A}) ${minute}'`);
       }
     }
 
     else if(event < 0.5){
-      shotsB++;
-      log(`🟡 ${B} attacks in ${minute}'`);
-      if(Math.random() < (0.15 - diff/200)){
+      log(`🟡 ${B} attack at ${minute}'`);
+
+      if(Math.random() < 0.18){
+        const scorer = randomPlayer(B);
         scoreB++;
-        log(`⚽ GOAL! ${players[Math.floor(Math.random()*players.length)]} (${B}) ${minute}'`);
+        log(`⚽ GOAL! ${scorer} (${B}) ${minute}'`);
       }
     }
 
     document.getElementById("score").innerText =
       `${A} ${scoreA} - ${scoreB} ${B}`;
 
-    document.getElementById("stats").innerHTML =
-      `Shots: ${A} ${shotsA} - ${shotsB} ${B}`;
+  },500);
+}
 
-    document.getElementById("possession").innerHTML =
-      `${A}: ${possA.toFixed(1)}% <br> ${B}: ${possB.toFixed(1)}%`;
-
-    if(minute >= 90){
-      clearInterval(match);
-      log("🏁 Full Time!");
-    }
-
-  },400);
+function randomPlayer(team){
+  const pool = players[team];
+  return pool[Math.floor(Math.random()*pool.length)];
 }
 
 function goBack(){
@@ -239,6 +266,7 @@ function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
+
 </script>
 
 </body>
