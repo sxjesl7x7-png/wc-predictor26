@@ -61,7 +61,7 @@ body{
   100%{opacity:0;transform:scale(1.1);}
 }
 
-/* ================= MAIN SCREENS ================= */
+/* ================= MAIN ================= */
 
 .screen{
   display:none;
@@ -82,9 +82,9 @@ select,button{
   border:2px solid rgba(255,215,0,0.9);
   border-radius:10px;
   font-size:16px;
-  box-shadow:0 0 8px rgba(255,215,0,0.3);
-  transition:0.25s ease;
   cursor:pointer;
+  transition:0.25s ease;
+  box-shadow:0 0 8px rgba(255,215,0,0.3);
 }
 
 button:hover,select:hover{
@@ -94,7 +94,6 @@ button:hover,select:hover{
 
 button:active,select:active{
   transform:scale(0.96);
-  box-shadow:0 0 20px #FFD700;
 }
 
 /* ================= OVERLAY ================= */
@@ -128,6 +127,7 @@ button:active,select:active{
   text-align:center;
   color:#FFD700;
   margin-top:10px;
+  text-shadow:0 0 15px #FFD700;
 }
 
 .stats,.goalBox{
@@ -197,13 +197,11 @@ button:active,select:active{
 
 <body>
 
-<!-- SPLASH -->
 <div id="splashScreen">
   <div class="wind"></div>
   <div class="sxj-logo">SXJ</div>
 </div>
 
-<!-- SELECT -->
 <div id="selectScreen" class="screen">
 
   <h2>🏆 World Cup 2026 Simulator</h2>
@@ -215,13 +213,11 @@ button:active,select:active{
 
 </div>
 
-<!-- OVERLAY -->
 <div id="overlay" class="overlay">
   <div class="wc">🏆 FIFA WORLD CUP 2026</div>
   <p id="loadingText">Loading Engine...</p>
 </div>
 
-<!-- RESULT -->
 <div id="resultScreen" class="screen">
 
   <div class="score" id="finalScore"></div>
@@ -236,7 +232,6 @@ button:active,select:active{
 
 /* TEAMS */
 let teams=["Argentina","Brazil","France","England","Spain","Germany","Portugal","Netherlands"];
-teams.sort();
 
 const teamA=document.getElementById("teamA");
 const teamB=document.getElementById("teamB");
@@ -249,22 +244,33 @@ teams.forEach(t=>{
   teamB.add(b);
 });
 
+/* TOP PLAYERS ONLY */
+const players={
+"Argentina":["Messi","Álvarez","Martínez"],
+"Brazil":["Vinícius","Rodrygo","Richarlison"],
+"France":["Mbappé","Griezmann","Thuram"],
+"England":["Kane","Saka","Foden"],
+"Spain":["Morata","Pedri","Yamal"],
+"Germany":["Musiala","Havertz","Kimmich"],
+"Portugal":["Ronaldo","Bruno","Nuno"],
+"Netherlands":["Depay","Gakpo","Simons"]
+};
+
+/* ONLY TOP 3 PICK */
+function randomPlayer(team){
+  return players[team][Math.floor(Math.random()*3)];
+}
+
 /* SIMPLE SIMULATION */
 function simulate(){
   return {
     scoreA:Math.floor(Math.random()*4),
     scoreB:Math.floor(Math.random()*4),
     possA:Math.floor(Math.random()*100),
-    possB:0,
     shotsA:10,shotsB:8,
     onTargetA:5,onTargetB:4,
     passesA:300,passesB:280
   };
-}
-
-/* RANDOM PLAYER */
-function randomPlayer(team){
-  return "Player";
 }
 
 /* SCREEN */
@@ -288,7 +294,6 @@ function startMatch(){
     document.getElementById("overlay").style.display="none";
 
     let result=simulate();
-
     result.possB=100-result.possA;
 
     document.getElementById("finalScore").innerText=
@@ -314,13 +319,27 @@ function startMatch(){
     `;
 
     setTimeout(()=>{
-
       document.getElementById("barA").style.width=result.possA+"%";
       document.getElementById("barB").style.width=result.possB+"%";
-
     },100);
 
-    document.getElementById("goalBox").innerHTML="Goals updated";
+    /* GOAL SCORERS FIXED */
+    let goals=[];
+
+    for(let i=0;i<result.scoreA;i++){
+      goals.push(`⚽ ${randomPlayer(A)} (${A})`);
+    }
+
+    for(let i=0;i<result.scoreB;i++){
+      goals.push(`⚽ ${randomPlayer(B)} (${B})`);
+    }
+
+    goals.sort(()=>Math.random()-0.5);
+
+    document.getElementById("goalBox").innerHTML=`
+      <b>Goalscorers</b><br><br>
+      ${goals.join("<br>")}
+    `;
 
     showScreen("resultScreen");
 
